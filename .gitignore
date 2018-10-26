@@ -1,0 +1,8 @@
+# IDEA configs
+.idea/
+
+# misc or otherwise large files
+ignore/
+data/
+*.json
+*.csv
