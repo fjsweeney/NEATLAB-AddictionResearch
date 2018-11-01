@@ -1,0 +1,24 @@
+#!/bin/bash
+
+###
+# USAGE: ./script <commands_file> 
+# 
+# Just runs a series of commands from a file. This will be used primarily to
+# convert Hexoskin and EMA data.
+###
+
+# Variables/Constants
+IN_FILE="$1"
+
+if [ -z "$1" ] ; then
+        echo "Must enter a command file."
+    else
+        # Read from commands file.
+        while read -u 10 line; do
+            echo Command being run: "$line" >> "runner.log"
+            $line >> "runner.log"
+        done 10<"$IN_FILE"
+
+    echo Done
+fi
+
