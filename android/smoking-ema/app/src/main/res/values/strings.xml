@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">EMA</string>
+    <string-array name="question_type">
+        <item>Multiple choice single answer</item>
+        <item>Range</item>
+        <item>Multiple choice multiple answer"</item>
+        <item>Descriptive</item>
+        <item>Multiple choice single answer with text input</item>
+    </string-array>
+
+
+    <string name="permission_rationale">Location permission is needed for core functionality</string>
+    <string name="permission_denied_explanation">Permission was denied, but is needed for core
+        functionality.</string>
+    <string name="settings">Settings</string>
+    <string name="ok">OK</string>
+
+    <string name="unknown_location">Unknown location</string>
+    <plurals name="num_locations_reported">
+        <item quantity="zero">No location reported</item>
+        <item quantity="one">One location reported</item>
+        <item quantity="other">%d locations reported</item>
+    </plurals>
+
+
+    <!-- Polyline/polygon styling -->
+    <string name="start_cap">Start cap</string>
+    <string name="end_cap">End cap</string>
+    <string name="joint_type">Joint Type</string>
+    <string name="pattern">Pattern</string>
+    <string name="cap_butt">Butt</string>
+    <string name="cap_square">Square</string>
+    <string name="cap_round">Round</string>
+    <string name="cap_image">Image</string>
+    <string name="joint_type_default">Default</string>
+    <string name="joint_type_bevel">Bevel</string>
+    <string name="joint_type_round">Round</string>
+    <string name="pattern_solid">Solid</string>
+    <string name="pattern_dotted">Dotted</string>
+    <string name="pattern_dashed">Dashed</string>
+    <string name="pattern_mixed">Mixed</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="ema_question_set">new_smoking_ema</string>
+</resources>

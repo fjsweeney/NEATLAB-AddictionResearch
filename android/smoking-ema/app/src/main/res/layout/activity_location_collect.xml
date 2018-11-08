@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/general_margin"
+    android:paddingLeft="@dimen/general_margin"
+    android:paddingRight="@dimen/general_margin"
+    android:paddingTop="@dimen/general_margin"
+    tools:context="com.tonmoy.smokingema.location.LocationActivity">
+
+    <TextView
+        android:id="@+id/using_batched_location_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location Updates"
+        android:layout_marginBottom="@dimen/general_margin"
+        />
+
+    <Button
+        android:id="@+id/buttonStartLocationUpdates"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="requestLocationUpdates"
+        android:text="Start Location Collection" />
+
+    <Button
+        android:id="@+id/buttonRemoveUpdates"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="removeLocationUpdates"
+        android:layout_marginBottom="@dimen/general_margin"
+        android:text="Stop Location Collection" />
+
+    <TextView
+        android:id="@+id/location_updates_result"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>

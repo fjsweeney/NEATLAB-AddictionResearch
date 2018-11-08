@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/general_margin"
+        tools:context="com.tonmoy.smokingema.HomeActivity">
+
+
+        <TextView
+            android:id="@+id/textviewUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="User" />
+
+        <Button
+            android:id="@+id/buttonAdmin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/general_margin"
+            android:text="Admin" />
+
+        <Button
+            android:id="@+id/buttonQuestionnaire"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/general_margin"
+            android:text="EMA Questionnaire"
+            android:textSize="34sp" />
+
+        <!-- Self-Report Smoking Episode CardView -->
+        <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                                            android:id="@+id/smoking-report-cardview"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            card_view:cardElevation="6dp"
+                                            card_view:cardBackgroundColor="#BBDEFB"
+                                            android:layout_marginTop="@dimen/general_margin"
+                                            card_view:cardCornerRadius="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/general_margin"
+                    android:layout_marginRight="@dimen/general_margin"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="Report a smoking episode?"
+                        android:textSize="20dp"
+                        android:textColor="#000000"
+                        android:textStyle="bold"/>
+
+                    <ImageView
+                        android:id="@+id/imageView1"
+                        android:layout_width="50dp"
+                        android:layout_height="25dp"
+                        android:src="@drawable/cig_icon"/>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/buttonSelfReportSmoke"
+                    android:layout_width="match_parent"
+                    android:layout_margin="@dimen/general_margin"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#E91E63"
+                    android:text="Submit"
+                    android:textColor="@android:color/white"
+                    android:textSize="24sp" />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <!-- Report Smoking Urge -->
+        <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                                            android:id="@+id/smoking-urge_card_view"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            card_view:cardElevation="6dp"
+                                            card_view:cardBackgroundColor="#BBDEFB"
+                                            android:layout_marginTop="@dimen/general_margin"
+                                            card_view:cardCornerRadius="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Record your current smoking urge?"
+                    android:textSize="20dp"
+                    android:textColor="#000000"
+                    android:textStyle="bold"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/general_margin"
+                    android:layout_marginRight="@dimen/general_margin"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="no urge at all"
+                        android:textColor="#4CAF50"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="moderate urge"
+                        android:textColor="#FFAB00"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="intense urge"
+                        android:textColor="#F44336"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <SeekBar
+                    android:id="@+id/smokingUrgeSeekBar"
+                    style="@style/CustomSeekBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:max="9"
+                    android:min="0"
+                    android:progress="5"
+                    android:splitTrack="false" />
+
+                <Button
+                    android:id="@+id/buttonSelfReportSmokingUrge"
+                    android:layout_width="match_parent"
+                    android:layout_margin="@dimen/general_margin"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#E91E63"
+                    android:text="Submit"
+                    android:textColor="@android:color/white"
+                    android:textSize="24sp" />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <!-- Stress Self-Report CardView -->
+        <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                                            android:id="@+id/stress_card_view"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            card_view:cardElevation="6dp"
+                                            card_view:cardBackgroundColor="#BBDEFB"
+                                            android:layout_marginTop="@dimen/general_margin"
+                                            card_view:cardCornerRadius="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Record your stress level?"
+                    android:textSize="20dp"
+                    android:textColor="#000000"
+                    android:textStyle="bold"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/general_margin"
+                    android:layout_marginRight="@dimen/general_margin"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="no stress at all"
+                        android:textColor="#4CAF50"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="moderately stressed"
+                        android:textColor="#FFAB00"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="highly stressed"
+                        android:textColor="#F44336"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <SeekBar
+                    android:id="@+id/likertSeekBar"
+                    style="@style/CustomSeekBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:max="9"
+                    android:min="0"
+                    android:progress="5"
+                    android:splitTrack="false" />
+
+                <Button
+                    android:id="@+id/buttonSelfReportStress"
+                    android:layout_width="match_parent"
+                    android:layout_margin="@dimen/general_margin"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#E91E63"
+                    android:text="Submit"
+                    android:textColor="@android:color/white"
+                    android:textSize="24sp" />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <Button
+            android:id="@+id/buttonSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/general_margin"
+            android:text="Settings" />
+
+</LinearLayout>
+
+</ScrollView>

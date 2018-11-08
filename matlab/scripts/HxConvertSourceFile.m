@@ -20,8 +20,7 @@
 % folder.
 
 
-
-function convertSourceFile(path)
+function HxConvertSourceFile(path)
 % convertSourceFile(path) converts all raw wav or hxd contained in a folder
 % to a more "human-friendly" format and saves it as a CSV in the same
 % folder
@@ -186,3 +185,6 @@ function saveKubiosECG(path, ECG)
 
 filename = fullfile(path,'ECG_kubios.txt');
 dlmwrite(filename, ECG, 'delimiter', ' ')
+
+
+HxConvertSourceFile('/home/webert3/smoking_viz_data/participant_1/hexoskin/10-19-2018_13:31')
