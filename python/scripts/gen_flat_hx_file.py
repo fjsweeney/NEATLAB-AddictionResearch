@@ -1,9 +1,10 @@
 import argparse
 from collections import OrderedDict
+from datetime import timedelta
 import os
 import pickle
 import pandas as pd
-from Preprocessing import align_timestamps
+from Preprocessing import alignment
 
 
 HEXOSKIN_FEATURE_SET = "/home/webert3/smoking_viz_data/hexoskin_feature_set"
@@ -12,6 +13,7 @@ ANDROID_FEATURE_SET = "/home/webert3/smoking_viz_data/android_feature_set"
 
 def read_android_data(df_map):
     os.chdir("ema")
+    print("Loading Android data...")
 
     # Get Android feature files
     feature_files = [filename.rstrip('\n') for filename in
@@ -29,6 +31,7 @@ def read_android_data(df_map):
 
 def read_hexoskin_data(df_map):
     os.chdir('hexoskin')
+    print("Loading Hexoskin data...")
 
     # Get hexoskin feature files
     feature_files = [filename.rstrip('\n') for filename in
@@ -39,7 +42,7 @@ def read_hexoskin_data(df_map):
     records = [item for item in os.listdir('./') if not item.endswith("pkl")]
 
     for record in records:
-        print("Loading data from record \"%s\"..." % record)
+        print("Record \"%s\"..." % record)
         os.chdir(record)
 
         for file in feature_files:
@@ -62,31 +65,34 @@ def read_hexoskin_data(df_map):
 def parse_from_files(args):
     df_map = OrderedDict()
 
-    # Change to participant's hexoskin directory
-    os.chdir(args.participant_dir)
-
     # Read in Android data
     df_map = read_android_data(df_map)
 
     # Read in Hexoskin data
     df_map = read_hexoskin_data(df_map)
 
-    # Dumping OrderedDict to 'pkl' file to save time during testing...
-    print("Dumping to \"feature_df_map.pkl\"")
-    pickle.dump(df_map, open("feature_df_map.pkl", "wb"))
+    # Set new header and convert all datetime strings to datetime objects
+    for feature in df_map:
+        df = df_map[feature]
+        df.columns = ["datetime", "values"]
+        df["datetime"] = pd.to_datetime(df["datetime"])
 
     return df_map
 
 
 def main(args):
-    if not os.path.isfile("hx_feature_df_map.pkl"):
-        hexoskin_dfs = parse_from_files(args)
-    else:
-        hexoskin_dfs = pickle.load(open("hx_feature_df_map.pkl", 'rb'))
+    # Change to participant's hexoskin directory
+    os.chdir(args.participant_dir)
 
-    # todo: Sort dictionary by length of attribute vector, then time align.
-    print('done')
+    df_map = parse_from_files(args)
 
+    # Merge and align all dataframes.
+    combined_df = alignment.merge_dataframes(df_map, timedelta(seconds=1))
+
+    print("Exporting to CSV...")
+    combined_df.to_csv("all_data.csv")
+
+    print('Done')
 
 
 if __name__ == "__main__":
