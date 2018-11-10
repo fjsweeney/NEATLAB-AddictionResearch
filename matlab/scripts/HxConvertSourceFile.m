@@ -37,6 +37,8 @@ if exist(path, 'dir')
             end
         end
     end
+else
+   disp('Path does not exist.') 
 end
 
 function data = loadData(path, filename)

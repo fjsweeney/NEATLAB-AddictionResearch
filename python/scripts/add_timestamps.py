@@ -25,7 +25,7 @@ def create_timestamps(filename, start_datetime):
 
     new_filename = filename.split('.')[0] + '_timestamps.csv'
     print("Writing data to file %s..." % new_filename)
-    df.to_csv(new_filename, header=None, index=False)
+    df.to_csv(new_filename)
 
 
 def main(args):
