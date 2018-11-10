@@ -18,10 +18,10 @@ def main(args):
         os.chdir(session)
 
         try:
-            rr_df = pd.read_csv(RR_INTERVALS_FILE, header=None, sep=",",
-                            names=["datetime", "rr"])
-            rr_quality_df = pd.read_csv(RR_QUALITIES_FILE, header=None, sep=",",
-                                    names=["datetime", "quality"])
+            rr_df = pd.read_csv(RR_INTERVALS_FILE, sep=",", header=0,
+                                names=["datetime", "rr"], index_col=0)
+            rr_quality_df = pd.read_csv(RR_QUALITIES_FILE, sep=",", header=0,
+                                    names=["datetime", "quality"], index_col=0)
         except FileNotFoundError as err:
             print("Couldn't find file for seesion: %s\n%s" %
                   (session, err.__str__()))
