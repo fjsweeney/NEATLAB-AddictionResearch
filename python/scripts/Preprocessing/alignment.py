@@ -65,7 +65,7 @@ def populate_combined_dataframe(combined_df, df_map):
     for i in range(1, combined_df.shape[0]):
         # Update progress bar every once in awhile...
         if (i % (combined_df.shape[0]//100)) == 0:
-            print("%.1f\% complete..." % ((i/combined_df.shape[0])*100))
+            print("%d%% complete..." % ((i/combined_df.shape[0])*100))
 
         end_time = combined_df.iloc[i]["datetime"]
 
