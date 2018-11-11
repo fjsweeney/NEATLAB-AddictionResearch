@@ -48,12 +48,15 @@ def read_hexoskin_data(df_map):
         for file in feature_files:
             colname = file.replace("_timestamps.csv", "")
 
-            # Append dataframes together
-            if colname in df_map:
-                df_map[colname] = df_map[colname].append(
-                     pd.read_csv(file, sep=",", index_col=0))
-            else:
-                df_map[colname] = pd.read_csv(file, sep=",", index_col=0)
+            try:
+                # Append dataframes together
+                if colname in df_map:
+                    df_map[colname] = df_map[colname].append(
+                         pd.read_csv(file, sep=",", index_col=0))
+                else:
+                    df_map[colname] = pd.read_csv(file, sep=",", index_col=0)
+            except FileNotFoundError as err:
+                print(err.__str__())
 
         os.chdir("..")
 
@@ -76,6 +79,7 @@ def parse_from_files(args):
         df = df_map[feature]
         df.columns = ["datetime", "values"]
         df["datetime"] = pd.to_datetime(df["datetime"])
+        df_map[feature] = df.sort_values(by=["datetime"])
 
     return df_map
 
