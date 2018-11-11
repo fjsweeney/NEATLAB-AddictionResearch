@@ -16,6 +16,9 @@ def get_time_range(df_map):
 
         # Update min
         df_min = min(df["datetime"])
+
+
+
         if min_time is None or min_time > df_min:
             min_time = df_min
 
@@ -103,14 +106,17 @@ def remove_empty_rows(df):
     :param df (DataFrame): A DataFrame
     :return (DataFrame): DataFrame with empty rows removed
     """
+    # Get all column names except for the datetime column.
     columns = list(df)
     columns.remove("datetime")
 
+    # Create filter to include all "empty" rows
     mask = (df[columns[0]] == -1.0)
     for column in columns[1:]:
         mask = mask & (df[column] == -1.0)
 
-    return df.loc[mask]
+    # Return all "non-empty" rows by negating the mask.
+    return df.loc[~mask]
 
 
 def merge_dataframes(df_map, frequency, remove_empties=True):

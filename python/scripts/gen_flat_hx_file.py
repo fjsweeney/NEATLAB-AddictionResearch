@@ -74,12 +74,34 @@ def parse_from_files(args):
     # Read in Hexoskin data
     df_map = read_hexoskin_data(df_map)
 
-    # Set new header and convert all datetime strings to datetime objects
+    clean_dataframes(df_map)
+
+    return df_map
+
+
+def clean_dataframes(df_map):
+    """
+    Clean DataFrames to prepare data before the merge.
+
+    :param df_map (dict): Feature -> DataFrame mapping
+    :return (dict): Clean version of df_map
+    """
+
     for feature in df_map:
         df = df_map[feature]
+
+        # Give generic column names
         df.columns = ["datetime", "values"]
+
+        # Convert time strings to datetime objects and sort by date.
         df["datetime"] = pd.to_datetime(df["datetime"])
-        df_map[feature] = df.sort_values(by=["datetime"])
+        df = df.sort_values(by=["datetime"])
+
+        # Remove rows with extraneous timestamps.
+        mask = (df["datetime"].dt.year == 2017)
+        df = df.loc[~mask]
+
+        df_map[feature] = df
 
     return df_map
 
