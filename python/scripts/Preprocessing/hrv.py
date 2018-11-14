@@ -2,37 +2,6 @@ import numpy as np
 import pandas as pd
 
 
-UNRELIABLE_RR = 128
-
-
-def clean_rr_series(rr_df, rr_quality_df):
-    """
-    Cleans RR series by removing unreliable data and converting data types for
-    ease of use.
-
-    :param rr_df (obj): Dataframe containing RR intervals
-    :param rr_quality_df (obj): Dataframe containing RR interval quality scores
-    :return (obj): Dataframe containing clean data
-    """
-    # Convert datetime strings to datetime objects.
-    rr_df["datetime"] = pd.to_datetime(rr_df["datetime"])
-    rr_quality_df["datetime"] = pd.to_datetime(rr_quality_df["datetime"])
-
-    # Drop all unreliable RR interval readings
-    for i in range(1, rr_df.shape[0]):
-        if rr_df.loc[i]["datetime"] == rr_quality_df.loc[i]["datetime"] and \
-           rr_quality_df.loc[i]["quality"] >= UNRELIABLE_RR:
-            rr_df = rr_df.drop(i)
-
-    # Remove any 0 values
-    rr_df = rr_df[rr_df["rr"] > 0]
-
-    # Convert RR interval to seconds from seconds/256
-    rr_df["rr"] = rr_df["rr"].apply(lambda x: x/256.0)
-
-    return rr_df
-
-
 # todo: Rewrite using NN_intervals and a sliding window approach.
 def gen_hrv_by_minute(rr_df, method):
     """

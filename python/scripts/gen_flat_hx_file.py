@@ -2,9 +2,8 @@ import argparse
 from collections import OrderedDict
 from datetime import timedelta
 import os
-import pickle
 import pandas as pd
-from Preprocessing import alignment
+from Preprocessing import alignment, qa
 
 
 HEXOSKIN_FEATURE_SET = "/home/webert3/smoking_viz_data/hexoskin_feature_set"
@@ -12,6 +11,16 @@ ANDROID_FEATURE_SET = "/home/webert3/smoking_viz_data/android_feature_set"
 
 
 def read_android_data(df_map):
+    """
+    Parses files containing Android features (i.e. files listed in
+    'ANDROID_FEATURE_SET')
+
+    Args:
+        df_map (dict): Feature -> DataFrame
+
+    Returns:
+        (dict) Updated df_map with Android feature DataFrames
+    """
     os.chdir("ema")
     print("Loading Android data...")
 
@@ -30,6 +39,16 @@ def read_android_data(df_map):
 
 
 def read_hexoskin_data(df_map):
+    """
+        Parses files containing Hexoskin features (i.e. files listed in
+        'HEXOSKIN_FEATURE_SET')
+
+        Args:
+            df_map (dict): Feature -> DataFrame
+
+        Returns:
+            (dict) Updated df_map with Hexoskin feature DataFrames
+        """
     os.chdir('hexoskin')
     print("Loading Hexoskin data...")
 
@@ -55,7 +74,7 @@ def read_hexoskin_data(df_map):
                          pd.read_csv(file, sep=",", index_col=0))
                 else:
                     df_map[colname] = pd.read_csv(file, sep=",", index_col=0)
-            except FileNotFoundError as err:
+            except Exception as err:
                 print(err.__str__())
 
         os.chdir("..")
@@ -83,8 +102,11 @@ def clean_dataframes(df_map):
     """
     Clean DataFrames to prepare data before the merge.
 
-    :param df_map (dict): Feature -> DataFrame mapping
-    :return (dict): Clean version of df_map
+    Args:
+        df_map (dict): Feature -> DataFrame mapping
+
+    Returns:
+        (dict) Cleaned up df_map
     """
 
     for feature in df_map:
@@ -103,6 +125,30 @@ def clean_dataframes(df_map):
 
         df_map[feature] = df
 
+    # Take only quality readings if quality scores are available.
+    print("Cleaning RR intervals...")
+    rr_df = qa.clean_hx_series(
+        df_map["RR_interval"], df_map["RR_interval_quality"],
+        qa.rr_qa_constants)
+
+    rr_df = rr_df[rr_df["values"] > 0]  # Remove any 0 values
+
+    # Convert RR interval to seconds from seconds/256
+    rr_df["values"] = rr_df["values"].apply(lambda x: x / 256.0)
+    df_map["RR_interval"] = rr_df
+    df_map.pop("RR_interval_quality")
+
+    print("Cleaning heart rate values...")
+    df_map["heart_rate"] = qa.clean_hx_series(
+        df_map["heart_rate"], df_map["heart_rate_quality"], qa.hr_qa_constants)
+    df_map.pop("heart_rate_quality")
+
+    print("Cleaning breathing rate values...")
+    df_map["breathing_rate"] = qa.clean_hx_series(
+        df_map["breathing_rate"], df_map["breathing_rate_quality"],
+        qa.br_qa_constants)
+    df_map.pop("breathing_rate_quality")
+
     return df_map
 
 
@@ -116,7 +162,7 @@ def main(args):
     combined_df = alignment.merge_dataframes(df_map, timedelta(seconds=1))
 
     print("Exporting to CSV...")
-    combined_df.to_csv("all_data.csv")
+    combined_df.to_csv("all_data_cleaned.csv")
 
     print('Done')
 

@@ -7,6 +7,7 @@ from Preprocessing import hrv
 RR_INTERVALS_FILE = "RR_interval_timestamps.csv"
 RR_QUALITIES_FILE = "RR_interval_quality_timestamps.csv"
 
+
 def main(args):
     # Change working directory to record and find all csv files.
     os.chdir(args.participant_dir)
