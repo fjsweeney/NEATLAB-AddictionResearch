@@ -13,16 +13,18 @@ def get_time_range(df_map):
     # Find min and max time from each df and update overall min/max.
     for feature in df_map:
         df = df_map[feature]
+        try:
+            # Update min
+            df_min = min(df["datetime"])
+            if min_time is None or min_time > df_min:
+                min_time = df_min
 
-        # Update min
-        df_min = min(df["datetime"])
-        if min_time is None or min_time > df_min:
-            min_time = df_min
-
-        # Update max
-        df_max = max(df["datetime"])
-        if max_time is None or max_time > df_max:
-            max_time = df_max
+            # Update max
+            df_max = max(df["datetime"])
+            if max_time is None or max_time > df_max:
+                max_time = df_max
+        except ValueError as err:
+            print("%s for feature: %s" % (err.__str__(), feature))
 
     return min_time, max_time
 
@@ -76,10 +78,16 @@ def populate_combined_dataframe(combined_df, df_map):
             # If multiple values in time range, compute the mean.
             row_sum, row_cnt = (0.0 for i in range(2))
             curr_idx = feature_idxs[feature]
-            while start_time <= df.iloc[curr_idx]["datetime"] < end_time:
-                row_sum += df.iloc[curr_idx]["values"]
-                row_cnt += 1
-                curr_idx += 1
+            try:
+                while not df.empty and \
+                        start_time <= df.iloc[curr_idx]["datetime"] < end_time:
+                    row_sum += df.iloc[curr_idx]["values"]
+                    row_cnt += 1
+                    curr_idx += 1
+            except IndexError as err:
+                print("%s for feature %s at index %d" %
+                      (err.__str__(), feature, curr_idx))
+
 
             # Update feature index
             feature_idxs[feature] = curr_idx
@@ -103,14 +111,17 @@ def remove_empty_rows(df):
     :param df (DataFrame): A DataFrame
     :return (DataFrame): DataFrame with empty rows removed
     """
+    # Get all column names except for the datetime column.
     columns = list(df)
     columns.remove("datetime")
 
+    # Create filter to include all "empty" rows
     mask = (df[columns[0]] == -1.0)
     for column in columns[1:]:
         mask = mask & (df[column] == -1.0)
 
-    return df.loc[mask]
+    # Return all "non-empty" rows by negating the mask.
+    return df.loc[~mask]
 
 
 def merge_dataframes(df_map, frequency, remove_empties=True):

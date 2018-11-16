@@ -1,81 +1,71 @@
 import numpy as np
-import pandas as pd
 
 
-UNRELIABLE_RR = 128
-
-
-def clean_rr_series(rr_df, rr_quality_df):
+def gen_hrv_by_window(df, delta, method, epsilon):
     """
-    Cleans RR series by removing unreliable data and converting data types for
-    ease of use.
+    Generate HRV values over a caller-specified timedelta taking a sliding
+    window approach.
 
-    :param rr_df (obj): Dataframe containing RR intervals
-    :param rr_quality_df (obj): Dataframe containing RR interval quality scores
-    :return (obj): Dataframe containing clean data
+    Args:
+        df (DataFrame): DataFrame containing RR interval time-series.
+        delta (timedelta64): Numpy timedelta specifying the time window.
+
+    Returns:
+        (DataFrame): DataFrame containing derived HRV values
+        (str): Name of the column containing derived HRV values
+
     """
-    # Convert datetime strings to datetime objects.
-    rr_df["datetime"] = pd.to_datetime(rr_df["datetime"])
-    rr_quality_df["datetime"] = pd.to_datetime(rr_quality_df["datetime"])
+    # Create relevant column header
+    hrv_colname = "hrv_%s" % delta.__str__().replace(" ", "_")
 
-    # Drop all unreliable RR interval readings
-    for i in range(1, rr_df.shape[0]):
-        if rr_df.loc[i]["datetime"] == rr_quality_df.loc[i]["datetime"] and \
-           rr_quality_df.loc[i]["quality"] >= UNRELIABLE_RR:
-            rr_df = rr_df.drop(i)
+    # Create hrv column
+    df[hrv_colname] = np.repeat(-1.0, df.shape[0])
 
-    # Remove any 0 values
-    rr_df = rr_df[rr_df["rr"] > 0]
+    # Create a enumerated index column to ensure proper indexing
+    df = df.set_index(np.arange(0, df.shape[0], 1))
 
-    # Convert RR interval to seconds from seconds/256
-    rr_df["rr"] = rr_df["rr"].apply(lambda x: x/256.0)
-
-    return rr_df
-
-
-# todo: Rewrite using NN_intervals and a sliding window approach.
-def gen_hrv_by_minute(rr_df, method):
-    """
-    Generates dataframe containing minute-to-minute HRV.
-
-    :param rr_df (obj): Dataframe containing RR intervals over time.
-    :param method (str): Method used to compute HRV
-    :return (obj): Dataframe containing minute-to-minute HRV
-    """
-
-    # Setup HRV dataframe
-    hrv_df = pd.DataFrame(columns=["datetime", "hrv"])
+    # Compute threshold for hrv values
+    threshold = delta.item().total_seconds()*epsilon
 
     # Compute using Root Mean Sum of Square Differences of adjacent RR intervals
     if method == "rmssd":
-        start_time = rr_df.iloc[0]["datetime"]  # Starting at first minute
-        row_idx = 0
+        print("Generating HRV data over the time interval: %s..." %
+              delta.__str__())
 
-        # Compute HRV for each consecutive minute
-        while start_time < rr_df.iloc[rr_df.shape[0] - 1]["datetime"]:
-            end_time = start_time + np.timedelta64(1, 'm')
+        # Iterate over all possible end times
+        for end_idx, row in df.iterrows():
+
+            # Update progress bar every once in awhile...
+            if (end_idx % (df.shape[0] // 100)) == 0:
+                print("%d%% complete..." % ((end_idx / df.shape[0]) * 100))
+
+            end_time = row["datetime"]
+            start_time = end_time - delta
 
             # Extract subset between start and end times.
-            mask = ((rr_df["datetime"] > start_time) &
-                    (rr_df["datetime"] < end_time))
-            subset = rr_df.loc[mask]
+            mask = ((df["datetime"] > start_time) &
+                    (df["datetime"] <= end_time) &
+                    (df["RR_interval"] != -1))
 
-            # If there exists more than two valid RR's, compute RMSSD
-            if subset.shape[0] > 1:
-                hrv_df.loc[row_idx] = [start_time,
-                                       calc_rmssd(np.asarray(subset["rr"]))]
-                row_idx += 1
+            subset = df.loc[mask]
 
-            start_time = start_time + np.timedelta64(1, 'm')
-    hrv_df.to_csv("hrv_timestamps.csv")
+            # Compute HRV values over window if we have enough
+            if subset.shape[0] >= threshold:
+                df[hrv_colname].iat[end_idx] = \
+                    calc_rmssd(subset["RR_interval"].values)
+
+    return df, hrv_colname
 
 
 def calc_sq_diffs(rr_intervals):
     """
     Computes square differences over array.
 
-    :param rr_intervals (ndarray): RR intervals over time (length=N).
-    :return (list): Square differences (length = N-1)
+    Args:
+        rr_intervals (ndarray): RR intervals over time (length=N).
+
+    Returns:
+        (list): Square differences (length = N-1)
     """
     sq_diffs = []
 
@@ -90,10 +80,13 @@ def calc_sq_diffs(rr_intervals):
 def calc_rmssd(rr_intervals):
     """
     Computes Root Mean Sum of Square Differences (RMSSD) of adjacent RR
-    intervals
+    intervals.
 
-    :param rr_intervals (ndarray): RR intervals over time
-    :return (float): RMSSD over provided list.
+    Args:
+        rr_intervals (ndarray): RR intervals over time
+
+    Returns:
+        (float): RMSSD over provided list.
     """
     sq_diffs = calc_sq_diffs(rr_intervals)
     return np.sqrt(np.mean(sq_diffs))
