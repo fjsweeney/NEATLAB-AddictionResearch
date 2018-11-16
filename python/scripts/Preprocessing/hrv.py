@@ -11,19 +11,34 @@ def gen_hrv_by_window(df, delta, method, epsilon):
         delta (timedelta64): Numpy timedelta specifying the time window.
 
     Returns:
+        (DataFrame): DataFrame containing derived HRV values
+        (str): Name of the column containing derived HRV values
 
     """
+    # Create relevant column header
+    hrv_colname = "hrv_%s" % delta.__str__().replace(" ", "_")
+
     # Create hrv column
-    df["hrv"] = np.repeat(-1.0, df.shape[0])
+    df[hrv_colname] = np.repeat(-1.0, df.shape[0])
+
+    # Create a enumerated index column to ensure proper indexing
+    df = df.set_index(np.arange(0, df.shape[0], 1))
 
     # Compute threshold for hrv values
     threshold = delta.item().total_seconds()*epsilon
 
     # Compute using Root Mean Sum of Square Differences of adjacent RR intervals
     if method == "rmssd":
+        print("Generating HRV data over the time interval: %s..." %
+              delta.__str__())
 
         # Iterate over all possible end times
         for end_idx, row in df.iterrows():
+
+            # Update progress bar every once in awhile...
+            if (end_idx % (df.shape[0] // 100)) == 0:
+                print("%d%% complete..." % ((end_idx / df.shape[0]) * 100))
+
             end_time = row["datetime"]
             start_time = end_time - delta
 
@@ -36,10 +51,10 @@ def gen_hrv_by_window(df, delta, method, epsilon):
 
             # Compute HRV values over window if we have enough
             if subset.shape[0] >= threshold:
-                df["hrv"].iat[end_idx] = \
+                df[hrv_colname].iat[end_idx] = \
                     calc_rmssd(subset["RR_interval"].values)
 
-    return df
+    return df, hrv_colname
 
 
 def calc_sq_diffs(rr_intervals):
