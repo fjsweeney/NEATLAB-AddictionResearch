@@ -10,6 +10,7 @@ google-cloud-storage==1.13.0
 google-resumable-media==0.3.1
 googleapis-common-protos==1.5.5
 idna==2.7
+imbalanced-learn==0.4.3
 msgpack==0.5.6
 numpy==1.15.3
 pandas==0.23.4
@@ -23,6 +24,8 @@ python-firebase==1.2
 pytz==2018.6
 requests==2.20.1
 rsa==4.0
+scikit-learn==0.20.0
 scipy==1.1.0
 six==1.11.0
+sklearn==0.0
 urllib3==1.24.1
