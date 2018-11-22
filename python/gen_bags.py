@@ -115,8 +115,8 @@ def main(args):
     print_bag_stats(test_labels)
 
     # todo: Pickle the data
-    pickle.dump(train, open("train_intv=%d_min.pkl" % args.bag_interval, "wb"))
-    pickle.dump(test, open("test_intv=%d_min.pkl" % args.bag_interval, "wb"))
+    pickle.dump(train, open("train_intv=%s_min.pkl" % args.bag_interval, "wb"))
+    pickle.dump(test, open("test_intv=%s_min.pkl" % args.bag_interval, "wb"))
 
     print('Done')
 
