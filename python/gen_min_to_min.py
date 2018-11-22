@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import numpy as np
 from scipy import stats
-from Preprocessing import hrv
+from SensorPreprocessing import hrv
 
 # Hard coding for now...
 SENSOR_FILENAME = 'all_data_cleaned.csv'
@@ -86,7 +86,7 @@ def add_standard_scores(df):
     for feature in feature_means:
         # Create new feature column
         if feature == "hrv":
-            colname = "hrv_mean"
+            colname = "hrv_zscore"
         else:
             colname = feature.replace("mean", "zscore")
         df[colname] = np.repeat(np.nan, df.shape[0])
