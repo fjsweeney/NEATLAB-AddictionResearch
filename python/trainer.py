@@ -23,7 +23,7 @@ def create_output_dir(model_type):
     now = dt.datetime.now()
     output_dir = "saved_models/%s/%s" % (model_type, 
         now.strftime("%Y-%m-%d_%H:%M:%S"))
-    call('mkdir "%s"' % output_dir, shell=True)
+    call('mkdir %s' % output_dir, shell=True)
 
     return output_dir
 
@@ -34,9 +34,9 @@ def main(args):
     if args.model == "RF":
         output_dir = create_output_dir("RF")
         trials, best = hh.random_forest_experiment(itrs=args.hyperopt,
-                                                   data=train)
-        pickle.dump(rf.best_rf, 
-                    open("%s/model.pkl" % output_dir, "wb"))
+                                                   data=train,
+                                                   output_dir=output_dir)
+        pickle.dump(rf.best_rf, open("%s/model.pkl" % output_dir, "wb"))
         pickle.dump(trials, open("%s/trials.pkl" % output_dir, "wb"))
         
         with open("%s/best_config" % output_dir, "w") as fp:

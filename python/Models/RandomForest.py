@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging
 import time
 import numpy as np
 from hyperopt import STATUS_OK
@@ -7,18 +8,33 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_fscore_support, confusion_matrix
 
+# Static variables
 SEED = 666
-
 best_f1 = 0
 best_rf = None
 best_feature_importance = None
 config_counter = 0
 
+
 class RandomForest:
-    def __init__(self, hyperparameters, data) -> None:
+    def __init__(self, hyperparameters, data, output_dir) -> None:
+        """
+        RandomForest model constructor. Responsible for splitting up data and
+        setting hyperparamters.
+
+        Args:
+            hyperparameters (dict): Contains relevant hyperparameters
+            data (list): List of Bag objects
+            output_dir (str): Path to output directory for model files.
+        """
         super().__init__()
 
-        self.hyperparameters = hyperparameters
+        # Set up log file to record general information about program operation
+        logging.basicConfig(filename='%s/training.log' % output_dir,
+                            level=logging.DEBUG,
+                            filemode='a',
+                            format='%(asctime)s - %(levelname)s: %(message)s',
+                            datefmt='%m/%d/%Y %I:%M:%S %p')
 
         # Extract bags and reshape to 2D array
         bags = np.asarray([x.instances for x in data])
@@ -40,41 +56,48 @@ class RandomForest:
             self.X_train, self.y_train = RandomOverSampler(random_state=SEED)\
                 .fit_resample(self.X_train, self.y_train)
 
-    def fit(self):
-        global best_f1, best_rf, best_feature_importance, config_counter
+        self.hyperparameters = hyperparameters
 
         # Convert params to appropriate types for scikit learn
         params = {
             "n_estimators": int(self.hyperparameters["n_estimators"]),
             "max_depth": int(self.hyperparameters["max_depth"]),
-            "min_samples_split": int(self.hyperparameters["min_samples_split"]),
-            "min_samples_leaf": int(self.hyperparameters["min_samples_leaf"])
+            "min_samples_split": int(
+                self.hyperparameters["min_samples_split"]),
+            "min_samples_leaf": int(
+                self.hyperparameters["min_samples_leaf"])
         }
 
-        model = RandomForestClassifier(**params,
-                                       random_state=SEED, n_jobs=-1)
+        self.model = RandomForestClassifier(**params, random_state=SEED,
+                                          n_jobs=-1)
+
+    def fit(self):
+        global best_f1, best_rf, best_feature_importance, config_counter
 
         # Train model
-        model.fit(self.X_train, self.y_train)
+        self.model.fit(self.X_train, self.y_train)
 
         # Evaluate performance on the dev set
-        dev_preds = model.predict(self.X_dev)
+        dev_preds = self.model.predict(self.X_dev)
         my_precision, my_recall, my_f1_score, my_support = \
             precision_recall_fscore_support(self.y_dev, dev_preds,
             average="binary")
         conf_matrix = confusion_matrix(self.y_dev, dev_preds)
         
-        print((my_precision))
-        print((my_recall))
-        print((my_f1_score))
+        print(my_precision)
+        print(my_recall)
+        print(my_f1_score)
 
+        logging.info("CONFIG %d: precision=%.5f, recall=%.5f, f1_score=%.5f" %
+              (config_counter, my_precision, my_recall, my_f1_score))
         print("CONFIG %d: precision=%.5f, recall=%.5f, f1_score=%.5f" %
               (config_counter, my_precision, my_recall, my_f1_score))
+        print("Confusion Matrix\n%s" % conf_matrix.__str__())
 
         if my_f1_score > best_f1:
             best_f1 = my_f1_score
-            best_rf = model
-            best_feature_importance = model.feature_importances_
+            best_rf = self.model
+            best_feature_importance = self.model.feature_importances_
         config_counter += 1
 
         return {

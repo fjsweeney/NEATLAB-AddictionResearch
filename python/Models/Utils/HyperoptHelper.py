@@ -5,13 +5,14 @@ from hyperopt import fmin, hp, Trials, rand
 from Models.RandomForest import RandomForest
 
 
-def random_forest_experiment(itrs, data):
+def random_forest_experiment(itrs, data, output_dir):
     """
     Set up a training experiment using Random Forest.
 
     Args:
         itrs (int): Number of hyperparameter configurations to test
         data (list): List of Bag objects
+        output_dir (str): Output directory for model files
 
     Returns:
         (obj): Trails object containing info about each Hyperopt trail
@@ -32,7 +33,7 @@ def random_forest_experiment(itrs, data):
 
     # Creating a higher order function to set all parameters except
     # "hyperparameters". This will be set during the call to 'fmin'.
-    rf = partial(RandomForest, data=data)
+    rf = partial(RandomForest, data=data, output_dir=output_dir)
     obj = partial(train_and_eval, model_class=rf)
 
     # NOTE: fmin is the function that finds and returns the optimal set of
@@ -53,14 +54,5 @@ def train_and_eval(hyperparameters, model_class):
 
     # Train model
     loss = model.fit()
-
-    # Evaluate forecacsting ability
-    #try:
-    #    model.evaluate_forecasting()
-    #except ValueError:
-    #    traceback.print_exc()
-    #except Exception as e:
-    #    print("Exception occurred when running inference: %s" % e.__str__())
-    #    print("The model you're trying to use likely diverged during training.")
 
     return loss
