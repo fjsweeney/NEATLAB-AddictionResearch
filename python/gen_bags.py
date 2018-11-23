@@ -104,7 +104,8 @@ def main(args):
 
     print("%d bags generated in total." % len(all_bags))
 
-    train, test = train_test_split(all_bags, shuffle=True, test_size=0.2)
+    train, test = train_test_split(all_bags, shuffle=True,
+                                   test_size=args.pct_test)
 
     train_labels = [x.label for x in train]
     test_labels = [x.label for x in test]
@@ -127,5 +128,7 @@ if __name__ == "__main__":
                         help="Directory containing participant data.")
     parser.add_argument("--bag_interval", type=str,
                         help="Number of minutes for each bag.")
+    parser.add_argument("--pct_test", type=float,
+                        help="Percent of data used for test set")
 
     main(parser.parse_args())

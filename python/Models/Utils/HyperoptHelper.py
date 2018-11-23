@@ -55,12 +55,12 @@ def train_and_eval(hyperparameters, model_class):
     loss = model.fit()
 
     # Evaluate forecacsting ability
-    try:
-        model.evaluate_forecasting()
-    except ValueError:
-        traceback.print_exc()
-    except Exception as e:
-        print("Exception occurred when running inference: %s" % e.__str__())
-        print("The model you're trying to use likely diverged during training.")
+    #try:
+    #    model.evaluate_forecasting()
+    #except ValueError:
+    #    traceback.print_exc()
+    #except Exception as e:
+    #    print("Exception occurred when running inference: %s" % e.__str__())
+    #    print("The model you're trying to use likely diverged during training.")
 
     return loss
