@@ -4,15 +4,16 @@ import datetime as dt
 import json
 import os
 import pickle
+import pprint
 from subprocess import call
 import Models.Utils.HyperoptHelper as hh
 import Models.RandomForest as rf
+import Models.RandomForestExperiment as rfe
 
 
-# TODO: Adding logging functionality
+def create_output_dir(args):
+    model_type = args.model
 
-
-def create_output_dir(model_type):
     if not os.path.isdir("./saved_models"):
         call("mkdir saved_models", shell=True)
     
@@ -25,22 +26,51 @@ def create_output_dir(model_type):
         now.strftime("%Y-%m-%d_%H:%M:%S"))
     call('mkdir %s' % output_dir, shell=True)
 
+    with open("%s/exp_config" % output_dir, "w") as fp:
+        fp.write(args.__str__())
+
     return output_dir
 
 
-def main(args):
-    train = pickle.load(open(args.train, "rb"))
-
+def run_hyperopt_experiment(train, args):
     if args.model == "RF":
-        output_dir = create_output_dir("RF")
+        output_dir = create_output_dir(args)
+
         trials, best = hh.random_forest_experiment(itrs=args.hyperopt,
                                                    data=train,
                                                    output_dir=output_dir)
         pickle.dump(rf.best_rf, open("%s/model.pkl" % output_dir, "wb"))
         pickle.dump(trials, open("%s/trials.pkl" % output_dir, "wb"))
-        
+
         with open("%s/best_config" % output_dir, "w") as fp:
             json.dump(best, fp)
+
+
+def run_sklearn_experiment(train, args):
+    if args.model == "RF":
+        output_dir = create_output_dir(args)
+
+        rf_exp = rfe.RandomForestExperiment(train, args.sklearn)
+
+        rf_exp.run()
+
+        # Print results of best model
+        print("Best F1 Score=%.5f" % rf_exp.best_score)
+        pprint.PrettyPrinter(indent=4).pprint(rf_exp.cv_results)
+
+        # Save results to experiment's output directory
+        pickle.dump(rf_exp.best_model, open("%s/model.pkl" % output_dir, "wb"))
+        pickle.dump(rf_exp.cv_results, open("%s/cv_results.pkl" % output_dir,
+                                            "wb"))
+
+
+def main(args):
+    train = pickle.load(open(args.train, "rb"))
+
+    if args.hyperopt:
+        run_hyperopt_experiment(train, args)
+    elif args.sklearn:
+        run_sklearn_experiment(train, args)
 
     print('Done')
 
@@ -48,15 +78,17 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--train", type=str, required=True,
-                        help="File containing train data (a pkl)")
-    parser.add_argument("--test", type=str,
-                        help="File containing test data (a pkl)")
+                        help="File containing training data (a pkl)")
     parser.add_argument("--bag_interval", type=str,
                         help="Number of minutes for each bag.")
     parser.add_argument("--model", type=str, required=True,
                         choices=["RF", "miSVM", "majority_class"],
                         help="Model type")
     parser.add_argument("--hyperopt", type=int,
-                        help="Number of hyperparameter iterations.")
+                        help="Number of hyperparameter iterations for "
+                             "hyperopt tuning.")
+    parser.add_argument("--sklearn", type=int,
+                        help="Number of hyperparameter iterations for sklearn "
+                             "tuning.")
 
     main(parser.parse_args())

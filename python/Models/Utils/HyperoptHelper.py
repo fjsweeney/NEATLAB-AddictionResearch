@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import traceback
 from functools import partial
 from hyperopt import fmin, hp, Trials, rand
 from Models.RandomForest import RandomForest

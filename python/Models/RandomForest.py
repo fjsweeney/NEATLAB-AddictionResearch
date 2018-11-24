@@ -4,6 +4,7 @@ import time
 import numpy as np
 from hyperopt import STATUS_OK
 from imblearn.over_sampling import SMOTE, ADASYN, RandomOverSampler
+from imblearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_fscore_support, \
@@ -44,26 +45,19 @@ class RandomForest:
         labels[labels < 0] = 0
 
         # Split data into train and dev sets
-        # self.X_train, self.X_dev, self.y_train, self.y_dev = \
-        #     train_test_split(bags, labels, test_size=0.15, random_state=SEED)
+        self.X_train, self.X_dev, self.y_train, self.y_dev = \
+            train_test_split(bags, labels, test_size=0.15, random_state=SEED)
 
         # Resample data set to alleviate class imbalance
         if hyperparameters["resampling"] == "SMOTE":
-            # self.X_train, self.y_train = SMOTE(random_state=SEED)\
-            #     .fit_resample(self.X_train, self.y_train)
-            self.X_train, self.y_train = SMOTE(random_state=SEED) \
-                .fit_resample(bags, labels)
+            self.X_train, self.y_train = SMOTE(random_state=SEED)\
+                .fit_resample(self.X_train, self.y_train)
         elif hyperparameters["resampling"] == "ADASYN":
-            # self.X_train, self.y_train = ADASYN(random_state=SEED)\
-            #     .fit_resample(self.X_train, self.y_train)
-            self.X_train, self.y_train = ADASYN(random_state=SEED) \
-                .fit_resample(bags, labels)
+            self.X_train, self.y_train = ADASYN(random_state=SEED)\
+                .fit_resample(self.X_train, self.y_train)
         elif hyperparameters["resampling"] == "RandomOverSampler":
-            # self.X_train, self.y_train = RandomOverSampler(random_state=SEED)\
-            #     .fit_resample(self.X_train, self.y_train)
-            self.X_train, self.y_train = RandomOverSampler(random_state=SEED) \
-                .fit_resample(bags, labels)
-
+            self.X_train, self.y_train = RandomOverSampler(random_state=SEED)\
+                .fit_resample(self.X_train, self.y_train)
         self.hyperparameters = hyperparameters
 
         # Convert params to appropriate types for scikit learn
