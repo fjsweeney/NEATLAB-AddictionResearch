@@ -1,6 +1,8 @@
 # misc or otherwise large files in the repo
 ignore/
 data/
+saved_models/
+saved_experiments/
 *.json
 *.csv
 commands
@@ -49,3 +51,6 @@ Thumbs.db
 
 # PYTHON
 __pycache__
+*.pyc
+.venv
+.env

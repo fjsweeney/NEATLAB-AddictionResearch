@@ -3,7 +3,7 @@ from collections import OrderedDict
 from datetime import timedelta
 import os
 import pandas as pd
-from Preprocessing import alignment, qa
+from SensorPreprocessing import alignment, qa
 
 
 HEXOSKIN_FEATURE_SET = "/home/webert3/smoking_viz_data/hexoskin_feature_set"
