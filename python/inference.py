@@ -6,22 +6,24 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_fscore_support, \
     confusion_matrix, accuracy_score, roc_curve, auc
 
+import Models.MajorityClass as mc
+
 SEED = 666
 
 
-def plot_roc_curves(fpr, tpr, auc):
+def finalize_roc_plot():
     plt.plot([0, 1], [0, 1], linestyle='--', lw=2, color='r',
              label='Chance', alpha=.8)
-
-    plt.plot(fpr, tpr, color='b',
-             label=r'RandomForest (AUC = %0.2f)' % (auc),
-             lw=2, alpha=.8)
-
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.title('Receiver operating characteristic for RandomForest Model')
     plt.legend(loc="lower right")
-    plt.show()
+
+
+def plot_roc_curves(fpr, tpr, label):
+    plt.plot(fpr, tpr, color='b',
+             label=label,
+             lw=2, alpha=.8)
 
 
 def main(args):
@@ -37,23 +39,44 @@ def main(args):
     X_train, X_dev, y_train, y_dev = \
         train_test_split(bags, labels, test_size=0.15, random_state=SEED)
 
-    # Compute scalar metrics
+    # Compute scalar metrics for model
     predictions = model.predict(X_dev)
     accuracy = accuracy_score(y_dev, predictions)
     my_precision, my_recall, my_f1_score, my_support = \
         precision_recall_fscore_support(y_dev, predictions, average="binary")
     conf_matrix = confusion_matrix(y_dev, predictions)
 
+    print("Model scores:")
     print("precision=%.5f, recall=%.5f, f1_score=%.5f accuracy=%.5f" %
           (my_precision, my_recall, my_f1_score, accuracy))
     print("Confusion Matrix\n%s" % conf_matrix.__str__())
 
-    # Compute & plot ROC curves
+    # Plot ROC curve for model
     probabilities = model.predict_proba(X_dev)[:, 1]
     fpr, tpr, thresholds = roc_curve(y_dev, probabilities, pos_label=1)
     roc_auc = auc(fpr, tpr)
-    
-    plot_roc_curves(fpr, tpr, roc_auc)
+    plot_roc_curves(fpr, tpr, label="Random Forest (AUC= % 0.2f)" % roc_auc)
+
+    # Compute scalar metrics for baseline
+    predictions = mc.predict(y_dev)
+    accuracy = accuracy_score(y_dev, predictions)
+    my_precision, my_recall, my_f1_score, my_support = \
+        precision_recall_fscore_support(y_dev, predictions, average="binary")
+    conf_matrix = confusion_matrix(y_dev, predictions)
+
+    print("Baseline scores:")
+    print("precision=%.5f, recall=%.5f, f1_score=%.5f accuracy=%.5f" %
+          (my_precision, my_recall, my_f1_score, accuracy))
+    print("Confusion Matrix\n%s" % conf_matrix.__str__())
+
+    # Plot ROC curve for baseline
+    probabilities = mc.predict_proba(y_dev)
+    fpr, tpr, thresholds = roc_curve(y_dev, probabilities, pos_label=1)
+    roc_auc = auc(fpr, tpr)
+    plot_roc_curves(fpr, tpr, label="Majority Class (AUC= % 0.2f)" % roc_auc)
+
+    finalize_roc_plot()
+    plt.show()
 
     print('Done')
 
