@@ -53,7 +53,8 @@ def generate_bags(sensor_df, smoking_df, bag_interval, pid):
 
         if not np.isnan(instances).any():
             all_bags.append(Bag(pid, start_time, end_time, instances,
-                                get_label(start_time, end_time, smoking_df)))
+                                get_label(start_time, end_time, smoking_df),
+                                feature_set))
 
         # Shift window by one minute
         start_time += np.timedelta64(1, 'm')
