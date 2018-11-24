@@ -6,7 +6,8 @@ from hyperopt import STATUS_OK
 from imblearn.over_sampling import SMOTE, ADASYN, RandomOverSampler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import precision_recall_fscore_support, confusion_matrix
+from sklearn.metrics import precision_recall_fscore_support, \
+    confusion_matrix, accuracy_score
 
 # Static variables
 SEED = 666
@@ -40,21 +41,28 @@ class RandomForest:
         bags = np.asarray([x.instances for x in data])
         bags = np.reshape(bags, newshape=(len(bags), -1))
         labels = np.asarray([x.label for x in data])
+        labels[labels < 0] = 0
 
         # Split data into train and dev sets
-        self.X_train, self.X_dev, self.y_train, self.y_dev = \
-            train_test_split(bags, labels, test_size=0.15, random_state=SEED)
+        # self.X_train, self.X_dev, self.y_train, self.y_dev = \
+        #     train_test_split(bags, labels, test_size=0.15, random_state=SEED)
 
         # Resample data set to alleviate class imbalance
         if hyperparameters["resampling"] == "SMOTE":
-            self.X_train, self.y_train = SMOTE(random_state=SEED)\
-                .fit_resample(self.X_train, self.y_train)
+            # self.X_train, self.y_train = SMOTE(random_state=SEED)\
+            #     .fit_resample(self.X_train, self.y_train)
+            self.X_train, self.y_train = SMOTE(random_state=SEED) \
+                .fit_resample(bags, labels)
         elif hyperparameters["resampling"] == "ADASYN":
-            self.X_train, self.y_train = ADASYN(random_state=SEED)\
-                .fit_resample(self.X_train, self.y_train)
+            # self.X_train, self.y_train = ADASYN(random_state=SEED)\
+            #     .fit_resample(self.X_train, self.y_train)
+            self.X_train, self.y_train = ADASYN(random_state=SEED) \
+                .fit_resample(bags, labels)
         elif hyperparameters["resampling"] == "RandomOverSampler":
-            self.X_train, self.y_train = RandomOverSampler(random_state=SEED)\
-                .fit_resample(self.X_train, self.y_train)
+            # self.X_train, self.y_train = RandomOverSampler(random_state=SEED)\
+            #     .fit_resample(self.X_train, self.y_train)
+            self.X_train, self.y_train = RandomOverSampler(random_state=SEED) \
+                .fit_resample(bags, labels)
 
         self.hyperparameters = hyperparameters
 
@@ -69,29 +77,30 @@ class RandomForest:
         }
 
         self.model = RandomForestClassifier(**params, random_state=SEED,
-                                          n_jobs=-1)
+                                            n_jobs=-1, oob_score=True)
 
     def fit(self):
         global best_f1, best_rf, best_feature_importance, config_counter
 
         # Train model
-        self.model.fit(self.X_train, self.y_train)
+        self.model.fit(self.X_train, self.y_train,)
 
-        # Evaluate performance on the dev set
-        dev_preds = self.model.predict(self.X_dev)
+        # Obtain out-of-bag predictions
+        oob_predictions = [np.argmax(x) for x in
+                           self.model.oob_decision_function_]
+
+        accuracy = accuracy_score(self.y_train, oob_predictions)
         my_precision, my_recall, my_f1_score, my_support = \
-            precision_recall_fscore_support(self.y_dev, dev_preds,
-            average="binary")
-        conf_matrix = confusion_matrix(self.y_dev, dev_preds)
-        
-        print(my_precision)
-        print(my_recall)
-        print(my_f1_score)
+            precision_recall_fscore_support(self.y_train, oob_predictions,
+                                            pos_label= 1, average="binary")
+        conf_matrix = confusion_matrix(self.y_train, oob_predictions)
 
-        logging.info("CONFIG %d: precision=%.5f, recall=%.5f, f1_score=%.5f" %
-              (config_counter, my_precision, my_recall, my_f1_score))
-        print("CONFIG %d: precision=%.5f, recall=%.5f, f1_score=%.5f" %
-              (config_counter, my_precision, my_recall, my_f1_score))
+        logging.info("CONFIG %d: precision=%.5f, recall=%.5f, f1_score=%.5f, "
+                     "accuracy=%.5f" %
+              (config_counter, my_precision, my_recall, my_f1_score, accuracy))
+        print("CONFIG %d: precision=%.5f, recall=%.5f, f1_score=%.5f "
+              "accuracy=%.5f" %
+              (config_counter, my_precision, my_recall, my_f1_score, accuracy))
         print("Confusion Matrix\n%s" % conf_matrix.__str__())
 
         if my_f1_score > best_f1:
