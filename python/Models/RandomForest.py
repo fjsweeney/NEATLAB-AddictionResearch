@@ -71,7 +71,7 @@ class RandomForest:
         }
 
         self.model = RandomForestClassifier(**params, random_state=SEED,
-                                            n_jobs=-1, oob_score=True)
+                                            n_jobs=-1)
 
     def fit(self):
         global best_f1, best_rf, best_feature_importance, config_counter
@@ -80,14 +80,13 @@ class RandomForest:
         self.model.fit(self.X_train, self.y_train,)
 
         # Obtain out-of-bag predictions
-        oob_predictions = [np.argmax(x) for x in
-                           self.model.oob_decision_function_]
+        dev_preds = self.model.predict(self.X_dev)
 
-        accuracy = accuracy_score(self.y_train, oob_predictions)
+        accuracy = accuracy_score(self.y_dev, dev_preds)
         my_precision, my_recall, my_f1_score, my_support = \
-            precision_recall_fscore_support(self.y_train, oob_predictions,
-                                            pos_label= 1, average="binary")
-        conf_matrix = confusion_matrix(self.y_train, oob_predictions)
+            precision_recall_fscore_support(self.y_dev, dev_preds,
+                                            pos_label=1, average="binary")
+        conf_matrix = confusion_matrix(self.y_dev, dev_preds)
 
         logging.info("CONFIG %d: precision=%.5f, recall=%.5f, f1_score=%.5f, "
                      "accuracy=%.5f" %

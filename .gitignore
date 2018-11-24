@@ -2,6 +2,7 @@
 ignore/
 data/
 saved_models/
+saved_experiments/
 *.json
 *.csv
 commands

@@ -42,7 +42,10 @@ def run_hyperopt_experiment(train, args):
         pickle.dump(rf.best_rf, open("%s/model.pkl" % output_dir, "wb"))
         pickle.dump(trials, open("%s/trials.pkl" % output_dir, "wb"))
 
-        with open("%s/best_config" % output_dir, "w") as fp:
+        with open("%s/feature_importances" % output_dir, "w") as fp:
+            fp.write(rf.best_rf.feature_importances_.__str__())
+
+        with open("%s/best_config.json" % output_dir, "w") as fp:
             json.dump(best, fp)
 
 
