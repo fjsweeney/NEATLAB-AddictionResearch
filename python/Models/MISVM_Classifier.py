@@ -4,20 +4,19 @@ import time
 import numpy as np
 from hyperopt import STATUS_OK
 from imblearn.over_sampling import SMOTE, ADASYN, RandomOverSampler
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_fscore_support, \
     confusion_matrix, accuracy_score
+from misvm import MISVM
 
 # Static variables
 SEED = 666
 best_f1 = 0
-best_rf = None
-best_feature_importance = None
+best_svm = None
 config_counter = 0
 
 
-class RandomForest:
+class MISVM_Classifier:
     def __init__(self, hyperparameters, data, output_dir):
         """
         RandomForest model constructor. Responsible for splitting up data and
@@ -37,11 +36,16 @@ class RandomForest:
                             format='%(asctime)s - %(levelname)s: %(message)s',
                             datefmt='%m/%d/%Y %I:%M:%S %p')
 
-        # Extract bags and reshape to 2D array
+        # Extract bags
         bags = np.asarray([x.instances for x in data])
+
+        # NOTE: Recording original shape of the bags to use after resampling.
+        n_instances = bags.shape[1]
+        n_features = bags.shape[2]
+
+        # Reshape to fit resampling library
         bags = np.reshape(bags, newshape=(len(bags), -1))
         labels = np.asarray([x.label for x in data])
-        labels[labels < 0] = 0
 
         # Split data into train and dev sets
         self.X_train, self.X_dev, self.y_train, self.y_dev = \
@@ -57,23 +61,25 @@ class RandomForest:
         elif hyperparameters["resampling"] == "RandomOverSampler":
             self.X_train, self.y_train = RandomOverSampler(random_state=SEED)\
                 .fit_resample(self.X_train, self.y_train)
+
+        # Reshape bags into 2d-arrays of shape (n_instances, n_features)
+        self.X_train = np.reshape(self.X_train,
+                                  newshape=(-1, n_instances, n_features))
+
         self.hyperparameters = hyperparameters
 
         # Convert params to appropriate types for scikit learn
         params = {
-            "n_estimators": int(self.hyperparameters["n_estimators"]),
-            "max_depth": int(self.hyperparameters["max_depth"]),
-            "min_samples_split": int(
-                self.hyperparameters["min_samples_split"]),
-            "min_samples_leaf": int(
-                self.hyperparameters["min_samples_leaf"])
+            "C": float(self.hyperparameters["C"]),
+            "max_iters": int(self.hyperparameters["max_iters"]),
+            "gamma": float(self.hyperparameters["gamma"]),
+            "kernel": self.hyperparameters["kernel"]
         }
 
-        self.model = RandomForestClassifier(**params, random_state=SEED,
-                                            n_jobs=-1)
+        self.model = MISVM(**params)
 
     def fit(self):
-        global best_f1, best_rf, best_feature_importance, config_counter
+        global best_f1, best_svm,  config_counter
 
         # Train model
         self.model.fit(self.X_train, self.y_train)
@@ -97,8 +103,7 @@ class RandomForest:
 
         if my_f1_score > best_f1:
             best_f1 = my_f1_score
-            best_rf = self.model
-            best_feature_importance = self.model.feature_importances_
+            best_svm = self.model
         config_counter += 1
 
         return {

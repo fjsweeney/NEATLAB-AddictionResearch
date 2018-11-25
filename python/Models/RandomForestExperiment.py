@@ -16,7 +16,7 @@ config_counter = 0
 
 
 class RandomForestExperiment:
-    def __init__(self, data, itrs=1) -> None:
+    def __init__(self, data, itrs=1):
         super().__init__()
 
         # Reformat input data

@@ -1,6 +1,6 @@
 class Bag:
     def __init__(self, pid, start_time, end_time, instances, label,
-                 feature_labels) -> None:
+                 feature_labels):
         super().__init__()
         self.feature_labels = feature_labels
         self.pid = pid

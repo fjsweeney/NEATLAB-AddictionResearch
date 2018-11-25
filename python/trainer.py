@@ -6,6 +6,7 @@ import os
 import pickle
 import pprint
 from subprocess import call
+import numpy as np
 import Models.Utils.HyperoptHelper as hh
 import Models.RandomForest as rf
 import Models.RandomForestExperiment as rfe
@@ -34,6 +35,7 @@ def create_output_dir(args):
 
 def run_hyperopt_experiment(train, args):
     if args.model == "RF":
+        print("Starting hyperopt experiment for Random Forest model...")
         output_dir = create_output_dir(args)
 
         trials, best = hh.random_forest_experiment(itrs=args.hyperopt,
@@ -48,8 +50,33 @@ def run_hyperopt_experiment(train, args):
         with open("%s/best_config.json" % output_dir, "w") as fp:
             json.dump(best, fp)
 
+    if args.model == "miSVM":
+        print("Starting hyperopt experiment for mi-SVM model...")
+        output_dir = create_output_dir(args)
+
+        trials, best = hh.miSVM_experiment(itrs=args.hyperopt, data=train,
+                                           output_dir=output_dir)
+        pickle.dump(rf.best_svm, open("%s/model.pkl" % output_dir, "wb"))
+        pickle.dump(trials, open("%s/trials.pkl" % output_dir, "wb"))
+
+        with open("%s/best_config.json" % output_dir, "w") as fp:
+            json.dump(best, fp)
+
+    if args.model == "MISVM":
+        print("Starting hyperopt experiment for MI-SVM model...")
+        output_dir = create_output_dir(args)
+
+        trials, best = hh.MISVM_experiment(itrs=args.hyperopt, data=train,
+                                           output_dir=output_dir)
+        pickle.dump(rf.best_svm, open("%s/model.pkl" % output_dir, "wb"))
+        pickle.dump(trials, open("%s/trials.pkl" % output_dir, "wb"))
+
+        with open("%s/best_config.json" % output_dir, "w") as fp:
+            json.dump(best, fp)
+
 
 def run_sklearn_experiment(train, args):
+    print("Starting sklearn experiment for Random Forest model...")
     if args.model == "RF":
         output_dir = create_output_dir(args)
 
@@ -70,6 +97,11 @@ def run_sklearn_experiment(train, args):
 def main(args):
     train = pickle.load(open(args.train, "rb"))
 
+    if args.take_mean:
+        print("Taking the feature mean of bag instances...")
+        for bag in train:
+            bag.instances = np.mean(bag.instances, axis=0)
+
     if args.hyperopt:
         run_hyperopt_experiment(train, args)
     elif args.sklearn:
@@ -85,7 +117,7 @@ if __name__ == "__main__":
     parser.add_argument("--bag_interval", type=str,
                         help="Number of minutes for each bag.")
     parser.add_argument("--model", type=str, required=True,
-                        choices=["RF", "miSVM", "majority_class"],
+                        choices=["RF", "miSVM", "MISVM"],
                         help="Model type")
     parser.add_argument("--hyperopt", type=int,
                         help="Number of hyperparameter iterations for "
@@ -93,5 +125,9 @@ if __name__ == "__main__":
     parser.add_argument("--sklearn", type=int,
                         help="Number of hyperparameter iterations for sklearn "
                              "tuning.")
+    parser.add_argument("--take_mean", action='store_true', default=False,
+                        help="Use the feature mean for each bag as one "
+                             "instance (as opposed to stacking multiple "
+                             "instances as the input to the model).")
 
     main(parser.parse_args())

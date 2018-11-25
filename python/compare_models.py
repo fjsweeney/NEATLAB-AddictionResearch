@@ -20,8 +20,11 @@ def finalize_roc_plot():
     plt.legend(loc="lower right")
 
 
-def plot_roc_curves(fpr, tpr, label):
-    plt.plot(fpr, tpr, color='b',
+def plot_roc_curves(fpr, tpr, label, tuning_lib):
+    # Use different color for cross-validation (i.e. sklearn tuning approach)
+    color = 'b' if tuning_lib == "hyperopt" else 'g'
+
+    plt.plot(fpr, tpr,
              label=label,
              lw=2, alpha=.8)
 
@@ -31,6 +34,7 @@ def finalize_stacked_bar_plot(exp_importances, feature_set):
 
     for i, exp in enumerate(exp_importances):
         # 'Stacking' values by adjusting the 'bottom' attribute
+        total_importance = 0
         total_importance = 0
         for j, importance in enumerate(exp_importances[exp]):
             scaled_importance = importance*100
@@ -63,6 +67,11 @@ def main(args):
 
         test = pickle.load(open(model["data_path"], "rb"))
 
+        if args.take_mean:
+            print("Taking the feature mean of bag instances...")
+            for bag in test:
+                bag.instances = np.mean(bag.instances, axis=0)
+
         # TODO: Using dev set for testing.
         bags = np.asarray([x.instances for x in test])
         bags = np.reshape(bags, newshape=(len(bags), -1))
@@ -89,20 +98,17 @@ def main(args):
             fpr, tpr, thresholds = roc_curve(y_dev, probabilities, pos_label=1)
             roc_auc = auc(fpr, tpr)
             plot_roc_curves(fpr, tpr, label="%s (AUC= % 0.2f)" %
-                                            (model["description"], roc_auc))
+                                            (model["description"], roc_auc),
+                            tuning_lib=model["tuning_lib"])
         elif args.viz == "feat_importance":
             # Set feature_set labels if that hasn't already happened
             if feature_set is None:
                 feature_set = model["feature_set"]
 
             # Aggregate feature importance
-            agg_importances = aggregate_feature_importance(model, saved_model)
+            agg_importances = aggregate_feature_importance(model, saved_model,
+                                                           args.take_mean)
             exp_importances[model["description"]] = agg_importances
-            # for i in range(len(agg_importances)):
-            #     if feature_set[i] in importances:
-            #         importances[feature_set[i]].append(agg_importances[i])
-            #     else:
-            #         importances[feature_set[i]] = [agg_importances[i]]
 
     if args.viz == "ROC_curves":
         finalize_roc_plot()
@@ -113,12 +119,16 @@ def main(args):
     print('Done')
 
 
-def aggregate_feature_importance(model, saved_model):
+def aggregate_feature_importance(model, saved_model, take_mean):
     feature_importances = saved_model.feature_importances_
-    time_interval = model["time_interval"]
-    feature_importances = np.reshape(feature_importances, newshape=(
-        time_interval, len(model["feature_set"])))
-    agg_feature_importance = np.sum(feature_importances, axis=0)
+    if not take_mean:
+        time_interval = model["time_interval"]
+        feature_importances = np.reshape(feature_importances, newshape=(
+            time_interval, len(model["feature_set"])))
+        agg_feature_importance = np.sum(feature_importances, axis=0)
+    else:
+        # No need to aggregate over bags, bags where aggregated before training
+        agg_feature_importance = feature_importances
     return agg_feature_importance
 
 
@@ -130,5 +140,9 @@ if __name__ == "__main__":
                         choices=["ROC_curves", "feat_importance"],
                         help="Type of plot to generate (I'm too lazy to use "
                              "subplots at the moment...")
+    parser.add_argument("--take_mean", action='store_true', default=False,
+                        help="Use the feature mean for each bag as one "
+                             "instance (as opposed to stacking multiple "
+                             "instances as the input to the model).")
 
     main(parser.parse_args())
