@@ -4,6 +4,46 @@ from hyperopt import fmin, hp, Trials, rand
 from Models.RandomForest import RandomForest
 from Models.miSVM_Classifier import miSVM_Classifier
 from Models.MISVM_Classifier import MISVM_Classifier
+from Models.LogisticRegression_Classifier import LogisticRegression_Classifier
+
+
+def logistic_regression_experiment(itrs, data, output_dir):
+    """
+    Set up a training experiment using Logistic Regression.
+
+    Args:
+        itrs (int): Number of hyperparameter configurations to test
+        data (list): List of Bag objects
+        output_dir (str): Output directory for model files
+
+    Returns:
+        (obj): Trails object containing info about each Hyperopt trail
+        (best): Best hyperparameter configuration
+    """
+    # Define hyperparamter space
+    hyperparameters = {
+        "penalty": hp.choice("penalty", ["l1", "l2"]),
+        "C": hp.choice("C", [0.001, 0.01, 0.1, 1, 10, 100]),
+        "resampling": hp.choice("resampling", ["SMOTE", "ADASYN",
+                                               "RandomOverSampler"])
+    }
+
+    # Creating a higher order function to set all parameters except
+    # "hyperparameters". This will be set during the call to 'fmin'.
+    lrc = partial(LogisticRegression_Classifier, data=data,
+                    output_dir=output_dir)
+    obj = partial(train_and_eval, model_class=lrc)
+
+    # NOTE: fmin is the function that finds and returns the optimal set of
+    # hyperparameters. It will train 'itrs' different models and search the
+    # 'hyperparameters' space for the optimal set of
+    # hyperparameters using the search algorithm specified by 'algo'.
+    # See: https://github.com/hyperopt/hyperopt/wiki/FMin
+    trials = Trials()
+    best = fmin(fn=obj, space=hyperparameters, algo=rand.suggest,
+                max_evals=itrs, trials=trials)
+
+    return trials, best
 
 
 def miSVM_experiment(itrs, data, output_dir):

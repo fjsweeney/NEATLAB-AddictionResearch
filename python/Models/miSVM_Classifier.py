@@ -18,15 +18,6 @@ config_counter = 0
 
 class miSVM_Classifier:
     def __init__(self, hyperparameters, data, output_dir):
-        """
-        RandomForest model constructor. Responsible for splitting up data and
-        setting hyperparamters.
-
-        Args:
-            hyperparameters (dict): Contains relevant hyperparameters
-            data (list): List of Bag objects
-            output_dir (str): Path to output directory for model files.
-        """
         super().__init__()
 
         # Set up log file to record general information about program operation

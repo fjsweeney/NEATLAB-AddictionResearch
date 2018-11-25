@@ -4,10 +4,10 @@ import time
 import numpy as np
 from hyperopt import STATUS_OK
 from imblearn.over_sampling import SMOTE, ADASYN, RandomOverSampler
+from sklearn.svm import LinearSVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_fscore_support, \
     confusion_matrix, accuracy_score
-from misvm import MISVM
 
 # Static variables
 SEED = 666
@@ -16,7 +16,7 @@ best_svm = None
 config_counter = 0
 
 
-class MISVM_Classifier:
+class SVM_Classifier:
     def __init__(self, hyperparameters, data, output_dir):
         super().__init__()
 
@@ -67,7 +67,7 @@ class MISVM_Classifier:
             "kernel": self.hyperparameters["kernel"]
         }
 
-        self.model = MISVM(**params)
+        self.model = LinearSVC(**params, dual=False)
 
     def fit(self):
         global best_f1, best_svm,  config_counter

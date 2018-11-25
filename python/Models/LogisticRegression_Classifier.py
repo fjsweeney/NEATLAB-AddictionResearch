@@ -4,19 +4,19 @@ import time
 import numpy as np
 from hyperopt import STATUS_OK
 from imblearn.over_sampling import SMOTE, ADASYN, RandomOverSampler
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_fscore_support, \
     confusion_matrix, accuracy_score
-from misvm import MISVM
 
 # Static variables
 SEED = 666
 best_f1 = 0
-best_svm = None
+best_model = None
 config_counter = 0
 
 
-class MISVM_Classifier:
+class LogisticRegression_Classifier:
     def __init__(self, hyperparameters, data, output_dir):
         super().__init__()
 
@@ -27,16 +27,18 @@ class MISVM_Classifier:
                             format='%(asctime)s - %(levelname)s: %(message)s',
                             datefmt='%m/%d/%Y %I:%M:%S %p')
 
-        # Extract bags
+        # Set up log file to record general information about program operation
+        logging.basicConfig(filename='%s/training.log' % output_dir,
+                            level=logging.DEBUG,
+                            filemode='a',
+                            format='%(asctime)s - %(levelname)s: %(message)s',
+                            datefmt='%m/%d/%Y %I:%M:%S %p')
+
+        # Extract bags and reshape to 2D array
         bags = np.asarray([x.instances for x in data])
-
-        # NOTE: Recording original shape of the bags to use after resampling.
-        n_instances = bags.shape[1]
-        n_features = bags.shape[2]
-
-        # Reshape to fit resampling library
         bags = np.reshape(bags, newshape=(len(bags), -1))
         labels = np.asarray([x.label for x in data])
+        labels[labels < 0] = 0
 
         # Split data into train and dev sets
         self.X_train, self.X_dev, self.y_train, self.y_dev = \
@@ -44,33 +46,27 @@ class MISVM_Classifier:
 
         # Resample data set to alleviate class imbalance
         if hyperparameters["resampling"] == "SMOTE":
-            self.X_train, self.y_train = SMOTE(random_state=SEED)\
+            self.X_train, self.y_train = SMOTE(random_state=SEED) \
                 .fit_resample(self.X_train, self.y_train)
         elif hyperparameters["resampling"] == "ADASYN":
-            self.X_train, self.y_train = ADASYN(random_state=SEED)\
+            self.X_train, self.y_train = ADASYN(random_state=SEED) \
                 .fit_resample(self.X_train, self.y_train)
         elif hyperparameters["resampling"] == "RandomOverSampler":
-            self.X_train, self.y_train = RandomOverSampler(random_state=SEED)\
+            self.X_train, self.y_train = RandomOverSampler(random_state=SEED) \
                 .fit_resample(self.X_train, self.y_train)
-
-        # Reshape bags into 2d-arrays of shape (n_instances, n_features)
-        self.X_train = np.reshape(self.X_train,
-                                  newshape=(-1, n_instances, n_features))
 
         self.hyperparameters = hyperparameters
 
         # Convert params to appropriate types for scikit learn
         params = {
-            "C": float(self.hyperparameters["C"]),
-            "max_iters": int(self.hyperparameters["max_iters"]),
-            "gamma": float(self.hyperparameters["gamma"]),
-            "kernel": self.hyperparameters["kernel"]
+            "penalty": self.hyperparameters["penalty"],
+            "C": float(self.hyperparameters["C"])
         }
 
-        self.model = MISVM(**params)
+        self.model = LogisticRegression(**params, random_state=SEED, n_jobs=-1)
 
     def fit(self):
-        global best_f1, best_svm,  config_counter
+        global best_f1, best_model,  config_counter
 
         # Train model
         self.model.fit(self.X_train, self.y_train)
@@ -94,7 +90,7 @@ class MISVM_Classifier:
 
         if my_f1_score > best_f1:
             best_f1 = my_f1_score
-            best_svm = self.model
+            best_model = self.model
         config_counter += 1
 
         return {

@@ -10,6 +10,9 @@ import numpy as np
 import Models.Utils.HyperoptHelper as hh
 import Models.RandomForest as rf
 import Models.RandomForestExperiment as rfe
+import Models.MISVM_Classifier as MISVM
+import Models.miSVM_Classifier as miSVM
+import Models.LogisticRegression_Classifier as lrc
 
 
 def create_output_dir(args):
@@ -56,7 +59,7 @@ def run_hyperopt_experiment(train, args):
 
         trials, best = hh.miSVM_experiment(itrs=args.hyperopt, data=train,
                                            output_dir=output_dir)
-        pickle.dump(rf.best_svm, open("%s/model.pkl" % output_dir, "wb"))
+        pickle.dump(miSVM.best_svm, open("%s/model.pkl" % output_dir, "wb"))
         pickle.dump(trials, open("%s/trials.pkl" % output_dir, "wb"))
 
         with open("%s/best_config.json" % output_dir, "w") as fp:
@@ -68,7 +71,19 @@ def run_hyperopt_experiment(train, args):
 
         trials, best = hh.MISVM_experiment(itrs=args.hyperopt, data=train,
                                            output_dir=output_dir)
-        pickle.dump(rf.best_svm, open("%s/model.pkl" % output_dir, "wb"))
+        pickle.dump(MISVM.best_svm, open("%s/model.pkl" % output_dir, "wb"))
+        pickle.dump(trials, open("%s/trials.pkl" % output_dir, "wb"))
+
+        with open("%s/best_config.json" % output_dir, "w") as fp:
+            json.dump(best, fp)
+
+    if args.model == "LRC":
+        print("Starting hyperopt experiment for Logistic Regression model...")
+        output_dir = create_output_dir(args)
+        trials, best = hh.logistic_regression_experiment(itrs=args.hyperopt,
+                                                       data=train,
+                                                       output_dir=output_dir)
+        pickle.dump(lrc.best_model, open("%s/model.pkl" % output_dir, "wb"))
         pickle.dump(trials, open("%s/trials.pkl" % output_dir, "wb"))
 
         with open("%s/best_config.json" % output_dir, "w") as fp:
@@ -76,8 +91,8 @@ def run_hyperopt_experiment(train, args):
 
 
 def run_sklearn_experiment(train, args):
-    print("Starting sklearn experiment for Random Forest model...")
     if args.model == "RF":
+        print("Starting sklearn experiment for Random Forest model...")
         output_dir = create_output_dir(args)
 
         rf_exp = rfe.RandomForestExperiment(train, args.sklearn)
@@ -117,7 +132,7 @@ if __name__ == "__main__":
     parser.add_argument("--bag_interval", type=str,
                         help="Number of minutes for each bag.")
     parser.add_argument("--model", type=str, required=True,
-                        choices=["RF", "miSVM", "MISVM"],
+                        choices=["RF", "miSVM", "MISVM", "LRC"],
                         help="Model type")
     parser.add_argument("--hyperopt", type=int,
                         help="Number of hyperparameter iterations for "
