@@ -4,7 +4,7 @@ import time
 import numpy as np
 from hyperopt import STATUS_OK
 from imblearn.over_sampling import SMOTE, ADASYN, RandomOverSampler
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_fscore_support, \
     confusion_matrix, accuracy_score
@@ -16,7 +16,7 @@ best_model = None
 config_counter = 0
 
 
-class LogisticRegression_Classifier:
+class GradientBoosted_Classifier:
     def __init__(self, hyperparameters, data, output_dir):
         super().__init__()
 
@@ -52,11 +52,16 @@ class LogisticRegression_Classifier:
 
         # Convert params to appropriate types for scikit learn
         params = {
-            "penalty": self.hyperparameters["penalty"],
-            "C": float(self.hyperparameters["C"])
+            "n_estimators": int(self.hyperparameters["n_estimators"]),
+            "min_samples_split": int(self.hyperparameters["min_samples_split"]),
+            "min_samples_leaf": int(self.hyperparameters["min_samples_leaf"]),
+            "max_depth": int(self.hyperparameters["max_depth"]),
+            "max_features": float(self.hyperparameters["max_features"]),
+            "subsample": float(self.hyperparameters["subsample"]),
+            "learning_rate": float(self.hyperparameters["learning_rate"])
         }
 
-        self.model = LogisticRegression(**params, random_state=SEED, n_jobs=-1)
+        self.model = GradientBoostingClassifier(**params, random_state=SEED)
 
     def fit(self):
         global best_f1, best_model,  config_counter

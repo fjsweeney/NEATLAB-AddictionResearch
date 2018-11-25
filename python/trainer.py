@@ -13,6 +13,7 @@ import Models.RandomForestExperiment as rfe
 import Models.MISVM_Classifier as MISVM
 import Models.miSVM_Classifier as miSVM
 import Models.LogisticRegression_Classifier as lrc
+import Models.GradientBoosted_Classifier as gbc
 
 
 def create_output_dir(args):
@@ -89,6 +90,19 @@ def run_hyperopt_experiment(train, args):
         with open("%s/best_config.json" % output_dir, "w") as fp:
             json.dump(best, fp)
 
+    if args.model == "GBC":
+        print("Starting hyperopt experiment for Gradient Boosted Decision Tree "
+              "model...")
+        output_dir = create_output_dir(args)
+        trials, best = hh.gradient_boosted_experiment(itrs=args.hyperopt,
+                                                      data=train,
+                                                      output_dir=output_dir)
+        pickle.dump(gbc.best_model, open("%s/model.pkl" % output_dir, "wb"))
+        pickle.dump(trials, open("%s/trials.pkl" % output_dir, "wb"))
+
+        with open("%s/best_config.json" % output_dir, "w") as fp:
+            json.dump(best, fp)
+
 
 def run_sklearn_experiment(train, args):
     if args.model == "RF":
@@ -132,7 +146,7 @@ if __name__ == "__main__":
     parser.add_argument("--bag_interval", type=str,
                         help="Number of minutes for each bag.")
     parser.add_argument("--model", type=str, required=True,
-                        choices=["RF", "miSVM", "MISVM", "LRC"],
+                        choices=["RF", "miSVM", "MISVM", "LRC", "GBC"],
                         help="Model type")
     parser.add_argument("--hyperopt", type=int,
                         help="Number of hyperparameter iterations for "
