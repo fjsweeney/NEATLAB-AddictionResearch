@@ -69,7 +69,7 @@ class RandomForest:
                 self.hyperparameters["min_samples_leaf"])
         }
 
-        self.model = RandomForestClassifier(params.values(), random_state=SEED,
+        self.model = RandomForestClassifier(**params, random_state=SEED,
                                             n_jobs=-1)
 
     def fit(self):

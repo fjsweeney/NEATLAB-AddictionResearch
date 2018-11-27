@@ -21,9 +21,17 @@ def finalize_roc_plot(title):
     plt.legend(loc="lower right")
 
 
-def finalize_pr_plot(title):
-    # plot no skill - NOTE: Depends class distribution. TODO: # Revisit this
-    # plt.plot([0, 1], [0.5, 0.5], linestyle='--', label='')
+def random_performance_pr(labels):
+    _, counts = np.unique(labels, return_counts=True)
+    P = counts[1]
+    N = counts[0]
+    return P/(P+N)
+
+
+def finalize_pr_plot(title, labels):
+    # plot no skill
+    baseline = random_performance_pr(labels)
+    plt.plot([0, 1], [baseline, baseline], linestyle='--', label='Chance')
     plt.xlabel('Recall')
     plt.ylabel('Precision')
     plt.title('%s' % title)
@@ -65,6 +73,25 @@ def finalize_stacked_bar_plot(exp_importances, feature_set):
     plt.yticks(np.arange(10, 110, 10))
 
 
+def sort_feature_importance(agg_importances, feature_set):
+    for i, feature in enumerate(feature_set):
+        print("feature=\"%s\", importance=%.4f" %
+              (feature, agg_importances[i]))
+
+
+def aggregate_feature_importance(model, saved_model, take_mean):
+    feature_importances = saved_model.feature_importances_
+    if not take_mean:
+        time_interval = model["time_interval"]
+        feature_importances = np.reshape(feature_importances, newshape=(
+            time_interval, len(model["feature_set"])))
+        agg_feature_importance = np.sum(feature_importances, axis=0)
+    else:
+        # No need to aggregate over bags, bags where aggregated before training
+        agg_feature_importance = feature_importances
+    return agg_feature_importance
+
+
 def main(args):
     if args.viz == "feat_importance":
         exp_importances = OrderedDict()
@@ -95,11 +122,18 @@ def main(args):
 
         labels[labels < 0] = 0
         y_dev = labels
-        # X_train, X_dev, y_train, y_dev = \
-        #     train_test_split(bags, labels, test_size=0.15, random_state=SEED)
+        X_train, X_dev, y_train, y_dev = \
+            train_test_split(bags, labels, test_size=0.15, random_state=SEED)
 
         # Compute scalar metrics for model
         predictions = saved_model.predict(X_dev)
+
+        unique, counts = np.unique(predictions, return_counts=True)
+        v_pct = float(counts[1]) / float(len(predictions))
+        nv_pct = float(counts[0]) / float(len(predictions))
+        print("Predicted Vulnerable: %.2f | Predicted Not Vulnerable: %.2f" %
+              (v_pct, nv_pct))
+
         accuracy = accuracy_score(y_dev, predictions)
         my_precision, my_recall, my_f1_score, my_support = \
             precision_recall_fscore_support(y_dev, predictions,
@@ -142,30 +176,19 @@ def main(args):
             # Aggregate feature importance
             agg_importances = aggregate_feature_importance(model, saved_model,
                                                            args.take_mean)
+            sort_feature_importance(agg_importances, feature_set)
+
             exp_importances[model["description"]] = agg_importances
 
     if args.viz == "ROC_curves":
         finalize_roc_plot(args.title)
     elif args.viz == "P-R_curves":
-        finalize_pr_plot(args.title)
+        finalize_pr_plot(args.title, labels)
     elif args.viz == "feat_importance":
         finalize_stacked_bar_plot(exp_importances, feature_set)
 
     plt.show()
     print('Done')
-
-
-def aggregate_feature_importance(model, saved_model, take_mean):
-    feature_importances = saved_model.feature_importances_
-    if not take_mean:
-        time_interval = model["time_interval"]
-        feature_importances = np.reshape(feature_importances, newshape=(
-            time_interval, len(model["feature_set"])))
-        agg_feature_importance = np.sum(feature_importances, axis=0)
-    else:
-        # No need to aggregate over bags, bags where aggregated before training
-        agg_feature_importance = feature_importances
-    return agg_feature_importance
 
 
 if __name__ == "__main__":
