@@ -72,6 +72,29 @@ def print_bag_stats(labels):
     print("Vulnerable: %.2f | Not Vulnerable: %.2f" % (v_pct, nv_pct))
 
 
+def remove_single_day(all_bags):
+    unique_days = np.unique([x.end_time.day for x in all_bags])
+
+    # Find the day with the fewest number of data points.
+    shortest_length = np.inf
+    shortest_day = None
+    for day in unique_days:
+        bags = [x for x in all_bags if x.end_time.day == day]
+
+        # Ensure that removed day contains at least one positive label.
+        pos_labels = [x for x in bags if x.label == 1]
+        num_pos_labels = len(pos_labels)
+
+        if 0 < len(bags) < shortest_length and num_pos_labels > 0:
+            shortest_length = len(bags)
+            shortest_day = day
+
+    train_bags = [x for x in all_bags if x.end_time.day != shortest_day]
+    test_bags = [x for x in all_bags if x.end_time.day == shortest_day]
+
+    return train_bags, test_bags
+
+
 def main(args):
     # Navigate to data directory
     os.chdir(args.base_dir)
@@ -81,7 +104,12 @@ def main(args):
                     filename.startswith('participant')]
 
     # Construct bags for each participant
-    all_bags = []
+    all_train_bags = []
+    all_test_bags = []
+
+    # Keep participant with largest validation set, our data set is too small.
+    largest_validation_pid = None
+    largest_validation_length = 0
     for participant in participants:
         print("Creating bags for %s..." % participant, end="")
         os.chdir(participant)
@@ -98,26 +126,44 @@ def main(args):
                                  index_col=0)
         smoking_df["datetime"] = pd.to_datetime(smoking_df["datetime"])
 
-        # Construct Bag objects
-        all_bags += generate_bags(sensor_df, smoking_df, args.bag_interval, pid)
+        # Leave-one-day-out approach
+        bags = generate_bags(sensor_df, smoking_df, args.bag_interval, pid)
+        train_bags, test_bags = remove_single_day(bags)
+
+        print("number of training bags=%d" % len(train_bags))
+        print("number of test bags=%d" % len(test_bags))
+
+        if len(test_bags) > largest_validation_length:
+            largest_validation_length = len(test_bags)
+            largest_validation_pid = pid
+
+        all_train_bags += train_bags
+        all_test_bags += test_bags
 
         os.chdir("../")
 
-    print("%d bags generated in total." % len(all_bags))
+    print("Total number of training bags=%d." % len(all_train_bags))
+    print("Total number of test bags=%d." % len(all_test_bags))
 
-    train, test = train_test_split(all_bags, shuffle=True,
-                                   test_size=args.pct_test)
+    # Move some bags to training set to put closer to 15% validation
+    print("Shifting pid=%s to the training set" % largest_validation_pid)
+    shift_bags = [x for x in all_test_bags if x.pid == largest_validation_pid]
+    all_train_bags += shift_bags
+    all_test_bags = [x for x in all_test_bags if x.pid !=
+                     largest_validation_pid]  # Remove shifted bags
 
-    train_labels = [x.label for x in train]
-    test_labels = [x.label for x in test]
+    print("Total number of training bags=%d." % len(all_train_bags))
+    print("Total number of test bags=%d." % len(all_test_bags))
 
     print("Train Data Stats:")
-    print_bag_stats(train_labels)
+    print_bag_stats([x.label for x in all_train_bags])
     print("Test Data Stats:")
-    print_bag_stats(test_labels)
+    print_bag_stats([x.label for x in all_test_bags])
 
-    pickle.dump(train, open("train_intv=%s_min.pkl" % args.bag_interval, "wb"))
-    pickle.dump(test, open("test_intv=%s_min.pkl" % args.bag_interval, "wb"))
+    pickle.dump(all_train_bags, open("train_intv=%s_min.pkl" %
+                                     args.bag_interval, "wb"))
+    pickle.dump(all_test_bags, open("test_intv=%s_min.pkl" %
+                                    args.bag_interval, "wb"))
 
     print('Done')
 
