@@ -1,11 +1,38 @@
 # -*- coding: utf-8 -*-
 from functools import partial
 from hyperopt import fmin, hp, Trials, rand
-from Models.RandomForest import RandomForest
-from Models.miSVM_Classifier import miSVM_Classifier
-from Models.MISVM_Classifier import MISVM_Classifier
-from Models.LogisticRegression_Classifier import LogisticRegression_Classifier
-from Models.GradientBoosted_Classifier import GradientBoosted_Classifier
+from Models.hyperopt_pipeline.RandomForest import RandomForest
+from Models.hyperopt_pipeline.miSVM_Classifier import miSVM_Classifier
+from Models.hyperopt_pipeline.MISVM_Classifier import MISVM_Classifier
+from Models.hyperopt_pipeline.LogisticRegression_Classifier import LogisticRegression_Classifier
+from Models.hyperopt_pipeline.GradientBoosted_Classifier import GradientBoosted_Classifier
+from Models.hyperopt_pipeline.SVM_Classifier import SVM_Classifier
+
+
+def SvmExperiment(itrs, data, output_dir):
+    # Define hyperparamter space
+    hyperparameters = {
+        "C": hp.choice("C", [0.001, 0.01, 0.1, 1, 10]),
+        "gamma": hp.choice("gamma", [0.001, 0.01, 0.1, 1]),
+        "resampling": hp.choice("resampling", ["SMOTE", "RandomOverSampler",
+                                               "None"])
+    }
+
+    # Creating a higher order function to set all parameters except
+    # "hyperparameters". This will be set during the call to 'fmin'.
+    svm = partial(SVM_Classifier, data=data, output_dir=output_dir)
+    obj = partial(train_and_eval, model_class=svm)
+
+    # NOTE: fmin is the function that finds and returns the optimal set of
+    # hyperparameters. It will train 'itrs' different models and search the
+    # 'hyperparameters' space for the optimal set of
+    # hyperparameters using the search algorithm specified by 'algo'.
+    # See: https://github.com/hyperopt/hyperopt/wiki/FMin
+    trials = Trials()
+    best = fmin(fn=obj, space=hyperparameters, algo=rand.suggest,
+                max_evals=itrs, trials=trials)
+
+    return trials, best
 
 
 def gradient_boosted_experiment(itrs, data, output_dir):

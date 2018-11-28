@@ -6,7 +6,6 @@ import numpy as np
 
 from Models.Preprocessing.Bag import Bag
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import train_test_split
 
 feature_set = ["activity_zscore", "cadence_zscore",
                "minute_ventilation_adjusted_zscore",

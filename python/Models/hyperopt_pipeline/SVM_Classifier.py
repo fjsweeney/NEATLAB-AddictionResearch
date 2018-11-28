@@ -3,8 +3,8 @@ import logging
 import time
 import numpy as np
 from hyperopt import STATUS_OK
-from imblearn.over_sampling import SMOTE, ADASYN, RandomOverSampler
-from sklearn.svm import LinearSVC
+from imblearn.over_sampling import SMOTE, RandomOverSampler
+from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_fscore_support, \
     confusion_matrix, accuracy_score
@@ -27,18 +27,14 @@ class SVM_Classifier:
                             format='%(asctime)s - %(levelname)s: %(message)s',
                             datefmt='%m/%d/%Y %I:%M:%S %p')
 
-        # Extract bags
+
+        # Extracct bags and reshape to 2D array
         bags = np.asarray([x.instances for x in data])
-
-        # NOTE: Recording original shape of the bags to use after resampling.
-        n_instances = bags.shape[1]
-        n_features = bags.shape[2]
-
-        # Reshape to fit resampling library
         bags = np.reshape(bags, newshape=(len(bags), -1))
         labels = np.asarray([x.label for x in data])
-
-        # Split data into train and dev sets
+        labels[labels < 0] = 0
+        
+		# Split data into train and dev sets
         self.X_train, self.X_dev, self.y_train, self.y_dev = \
             train_test_split(bags, labels, test_size=0.15, random_state=SEED)
 
@@ -46,28 +42,21 @@ class SVM_Classifier:
         if hyperparameters["resampling"] == "SMOTE":
             self.X_train, self.y_train = SMOTE(random_state=SEED)\
                 .fit_resample(self.X_train, self.y_train)
-        elif hyperparameters["resampling"] == "ADASYN":
-            self.X_train, self.y_train = ADASYN(random_state=SEED)\
-                .fit_resample(self.X_train, self.y_train)
         elif hyperparameters["resampling"] == "RandomOverSampler":
             self.X_train, self.y_train = RandomOverSampler(random_state=SEED)\
                 .fit_resample(self.X_train, self.y_train)
-
-        # Reshape bags into 2d-arrays of shape (n_instances, n_features)
-        self.X_train = np.reshape(self.X_train,
-                                  newshape=(-1, n_instances, n_features))
+        elif hyperparameters["resampling"] == "None":
+            print("No resampling...")
 
         self.hyperparameters = hyperparameters
 
         # Convert params to appropriate types for scikit learn
         params = {
             "C": float(self.hyperparameters["C"]),
-            "max_iters": int(self.hyperparameters["max_iters"]),
             "gamma": float(self.hyperparameters["gamma"]),
-            "kernel": self.hyperparameters["kernel"]
         }
 
-        self.model = LinearSVC(**params, dual=False)
+        self.model = SVC(**params, random_state=SEED)
 
     def fit(self):
         global best_f1, best_svm,  config_counter

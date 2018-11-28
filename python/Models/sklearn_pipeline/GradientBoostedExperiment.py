@@ -2,20 +2,15 @@
 import numpy as np
 from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
 from scipy.stats import randint, uniform
-from dask.diagnostics import ProgressBar
 
 # Static variables
 SEED = 666
-best_f1 = 0
-best_rf = None
-best_feature_importance = None
-config_counter = 0
 
 
-class RandomForestExperiment:
+class GradientBoostedExperiment:
     def __init__(self, data, itrs=1):
         super().__init__()
 
@@ -31,8 +26,7 @@ class RandomForestExperiment:
         # set for SMOTE, which biases the results.
         pipeline = Pipeline([
             ('sampling', SMOTE(random_state=SEED)),
-            ('classification', RandomForestClassifier(random_state=SEED,
-                                                      n_jobs=-1, verbose=1))
+            ('classification', GradientBoostingClassifier(random_state=SEED))
         ])
 
         hspace = {
@@ -41,25 +35,19 @@ class RandomForestExperiment:
             "classification__min_samples_leaf": randint(1, 20),
             "classification__max_depth": randint(1, 20),
             "classification__max_features": uniform(0.01, 0.8),
-            "classification__criterion": ["gini", "entropy"]
+            "classification__subsample": uniform(0.1, 0.9),
+            "classification__learning_rate": uniform(0.0001, 0.1),
         }
 
+        score_metrics = ['f1', 'precision', 'recall', 'accuracy', 'roc_auc']
         self.grid = RandomizedSearchCV(estimator=pipeline,
                                        param_distributions=hspace,
-                                       scoring="f1", n_iter=itrs, n_jobs=-1,
-                                       random_state=SEED, 
-                                       cv=StratifiedKFold(n_splits=10,
+                                       scoring=score_metrics, n_iter=itrs,
+                                       n_jobs=-1, verbose=10,
+                                       random_state=SEED, refit="f1",
+                                       cv=StratifiedKFold(n_splits=6,
                                                           shuffle=True,
                                                           random_state=SEED))
-        self.cv_results = None
-        self.best_model = None
-        self.best_params = None
-        self.best_score = 0
 
     def run(self):
-        with ProgressBar():
-            self.grid.fit(self.X, self.y)
-
-        self.best_model = self.grid.best_estimator_
-        self.best_score = self.grid.best_score_
-        self.cv_results = self.grid.cv_results_
+        self.grid.fit(self.X, self.y)
