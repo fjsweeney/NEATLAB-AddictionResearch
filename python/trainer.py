@@ -138,13 +138,7 @@ def run_sklearn_experiment(train, args):
         exp.run()
 
         # Save results to experiment's output directory
-        pickle.dump(exp.grid.best_estimator_, \
-                            open("%s/model.pkl" % output_dir, "wb"))
-
-        results_df = pd.DataFrame(exp.grid.cv_results_)
-
-        print("Best Score (F1): %0.5f" % exp.grid.best_score_)
-        results_df.to_csv('%s/cv_results.csv' % output_dir, sep=",")
+        export_experiment_results(exp, output_dir)
 
     elif args.model == "LRC":
         print("Starting sklearn experiment for Logistic Regression model...")
@@ -154,13 +148,7 @@ def run_sklearn_experiment(train, args):
         exp.run()
 
         # Save results to experiment's output directory
-        pickle.dump(exp.grid.best_estimator_, \
-                    open("%s/model.pkl" % output_dir, "wb"))
-
-        results_df = pd.DataFrame(exp.grid.cv_results_)
-
-        print("Best Score (F1): %0.5f" % exp.grid.best_score_)
-        results_df.to_csv('%s/cv_results.csv' % output_dir, sep=",")
+        export_experiment_results(exp, output_dir)
 
     elif args.model == "GBC":
         print("Starting sklearn experiment for Gradient Boosted Decision Tree "
@@ -171,13 +159,7 @@ def run_sklearn_experiment(train, args):
         exp.run()
 
         # Save results to experiment's output directory
-        pickle.dump(exp.grid.best_estimator_, \
-                    open("%s/model.pkl" % output_dir, "wb"))
-
-        results_df = pd.DataFrame(exp.grid.cv_results_)
-
-        print("Best Score (F1): %0.5f" % exp.grid.best_score_)
-        results_df.to_csv('%s/cv_results.csv' % output_dir, sep=",")
+        export_experiment_results(exp, output_dir)
 
     elif args.model == "SVM":
         print("Starting sklearn experiment for Support Vector Machine model...")
@@ -187,16 +169,19 @@ def run_sklearn_experiment(train, args):
         exp.run()
 
         # Save results to experiment's output directory
-        pickle.dump(exp.grid.best_estimator_, \
-                    open("%s/model.pkl" % output_dir, "wb"))
-
-        results_df = pd.DataFrame(exp.grid.cv_results_)
-
-        print("Best Score (F1): %0.5f" % exp.grid.best_score_)
-        results_df.to_csv('%s/cv_results.csv' % output_dir, sep=",")
+        export_experiment_results(exp, output_dir)
 
     else:
         raise ValueError("Experiment class not found.")
+
+
+def export_experiment_results(exp, output_dir):
+    pickle.dump(exp.grid.best_estimator_,
+                open("%s/model.pkl" % output_dir, "wb"))
+    pickle.dump(exp.grid, open("%s/grid.pkl" % output_dir, "wb"))
+    results_df = pd.DataFrame(exp.grid.cv_results_)
+    print("Best Score (F1): %0.5f" % exp.grid.best_score_)
+    results_df.to_csv('%s/cv_results.csv' % output_dir, sep=",")
 
 
 def main(args):
