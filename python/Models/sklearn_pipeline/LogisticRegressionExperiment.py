@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
+from scipy.stats import uniform
 
 # Static variables
 SEED = 666
@@ -20,17 +20,16 @@ class LogisticRegressionExperiment:
         labels[labels < 0] = 0
         self.y = labels
 
-        # NOTE: I specifically use a imblearn pipeline instead of a sklearn
-        # pipeline. This is because sklearn pipelines will use the validation
-        # set for SMOTE, which biases the results.
+        # NOTE: No SMOTE here, as Logistic Regression responds poorly to
+        # varying distributions in the train and test sets.
         pipeline = Pipeline([
-            ('sampling', SMOTE(random_state=SEED)),
             ('classification', LogisticRegression(random_state=SEED, n_jobs=-1))
         ])
 
         hspace = {
             "classification__penalty": ["l1", "l2"],
-            "classification__C": [0.001, 0.01, 0.1, 1, 10, 100],
+            "classification__C": uniform(0.001, (100-0.001)),
+            "classification__class_weight": [None, "balanced"]
         }
 
         score_metrics = ['f1', 'precision', 'recall', 'accuracy', 'roc_auc']

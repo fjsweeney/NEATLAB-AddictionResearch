@@ -26,7 +26,7 @@ class SvmExperiment:
         # set for SMOTE, which biases the results.
         pipeline = Pipeline([
             ('sampling', SMOTE(random_state=SEED)),
-            ('classification', SVC(random_state=SEED))
+            ('classification', SVC(random_state=SEED, probability=True))
         ])
 
         hspace = {

@@ -107,8 +107,8 @@ def main(args):
     all_test_bags = []
 
     # Keep participant with largest validation set, our data set is too small.
-    largest_validation_pid = None
-    largest_validation_length = 0
+    # largest_validation_pid = None
+    # largest_validation_length = 0
     for participant in participants:
         print("Creating bags for %s..." % participant, end="")
         os.chdir(participant)
@@ -127,42 +127,48 @@ def main(args):
 
         # Leave-one-day-out approach
         bags = generate_bags(sensor_df, smoking_df, args.bag_interval, pid)
-        train_bags, test_bags = remove_single_day(bags)
 
-        print("number of training bags=%d" % len(train_bags))
-        print("number of test bags=%d" % len(test_bags))
+        # todo: REMOVE!
+        all_train_bags += bags
 
-        if len(test_bags) > largest_validation_length:
-            largest_validation_length = len(test_bags)
-            largest_validation_pid = pid
+        # train_bags, test_bags = remove_single_day(bags)
 
-        all_train_bags += train_bags
-        all_test_bags += test_bags
+        # print("number of training bags=%d" % len(train_bags))
+        # print("number of test bags=%d" % len(test_bags))
+        #
+        # if len(test_bags) > largest_validation_length:
+        #     largest_validation_length = len(test_bags)
+        #     largest_validation_pid = pid
+        #
+        # all_train_bags += train_bags
+        # all_test_bags += test_bags
 
         os.chdir("../")
 
     print("Total number of training bags=%d." % len(all_train_bags))
-    print("Total number of test bags=%d." % len(all_test_bags))
+    # print("Total number of test bags=%d." % len(all_test_bags))
 
     # Move some bags to training set to put closer to 15% validation
-    print("Shifting pid=%s to the training set" % largest_validation_pid)
-    shift_bags = [x for x in all_test_bags if x.pid == largest_validation_pid]
-    all_train_bags += shift_bags
-    all_test_bags = [x for x in all_test_bags if x.pid !=
-                     largest_validation_pid]  # Remove shifted bags
-
+    # print("Shifting pid=%s to the training set" % largest_validation_pid)
+    # shift_bags = [x for x in all_test_bags if x.pid == largest_validation_pid]
+    # all_train_bags += shift_bags
+    # all_test_bags = [x for x in all_test_bags if x.pid !=
+    #                  largest_validation_pid]  # Remove shifted bags
+ 
     print("Total number of training bags=%d." % len(all_train_bags))
-    print("Total number of test bags=%d." % len(all_test_bags))
+    # print("Total number of test bags=%d." % len(all_test_bags))
 
     print("Train Data Stats:")
     print_bag_stats([x.label for x in all_train_bags])
-    print("Test Data Stats:")
-    print_bag_stats([x.label for x in all_test_bags])
+    # print("Test Data Stats:")
+    # print_bag_stats([x.label for x in all_test_bags])
 
-    pickle.dump(all_train_bags, open("train_intv=%s_min.pkl" %
+    pickle.dump(all_train_bags, open("all_intv=%s_min.pkl" %
                                      args.bag_interval, "wb"))
-    pickle.dump(all_test_bags, open("test_intv=%s_min.pkl" %
-                                    args.bag_interval, "wb"))
+    # pickle.dump(all_train_bags, open("train_intv=%s_min.pkl" %
+    #                                  args.bag_interval, "wb"))
+    # pickle.dump(all_test_bags, open("test_intv=%s_min.pkl" %
+    #                                 args.bag_interval, "wb"))
 
     print('Done')
 
