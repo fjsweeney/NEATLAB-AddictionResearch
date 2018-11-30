@@ -12,15 +12,6 @@ from sklearn.metrics import precision_recall_fscore_support, \
 SEED = 666
 
 
-def finalize_roc_plot(title):
-    plt.plot([0, 1], [0, 1], linestyle='--', lw=2, color='r',
-             label='Chance', alpha=.8)
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('%s' % title)
-    plt.legend(loc="lower right")
-
-
 def random_performance_pr(labels):
     _, counts = np.unique(labels, return_counts=True)
     P = counts[1]
@@ -28,25 +19,11 @@ def random_performance_pr(labels):
     return P/(P+N)
 
 
-def finalize_pr_plot(title, labels):
-    # plot no skill
-    baseline = random_performance_pr(labels)
-    plt.plot([0, 1], [baseline, baseline], linestyle='--',
-             label='Chance (AUC=%0.2f)' % baseline)
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
-    plt.title('%s' % title)
-    plt.legend(loc="lower right")
-
-
 def plot_pr_curve(recall, precision, label):
     plt.plot(recall, precision, label=label, lw=2, alpha=.8)
 
 
-def plot_roc_curve(fpr, tpr, label, tuning_lib):
-    # Use different color for cross-validation (i.e. sklearn tuning approach)
-    color = 'b' if tuning_lib == "hyperopt" else 'g'
-
+def plot_roc_curve(fpr, tpr, label):
     plt.plot(fpr, tpr, label=label, lw=2, alpha=.8)
 
 
@@ -69,9 +46,59 @@ def finalize_stacked_bar_plot(exp_importances, feature_set):
                   ncol=4, fancybox=True, shadow=True)
 
     plt.ylabel('Variable Importance')
-    plt.title('Feature Importance by Time Interval')
+    # plt.title('Feature Importance by Time Interval')
     plt.xticks(np.arange(0, len(exp_importances)), exp_importances.keys())
     plt.yticks(np.arange(10, 110, 10))
+
+
+def finalize_roc_plot(title):
+    plt.plot([0, 1], [0, 1], linestyle='--', lw=2, color='r',
+             label='Chance', alpha=.8)
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    # plt.title('%s' % title)
+
+    # Remove whitespace and align at the origin
+    plt.tight_layout()
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.xlim([0, 1.01])
+    plt.ylim([0, 1.01])
+    plt.grid()
+
+    handles, labels = plt.gca().get_legend_handles_labels()
+    by_label = OrderedDict(zip(labels, handles))
+    plt.figlegend(by_label.values(), by_label.keys(), loc='lower center',
+                  ncol=2, fancybox=True, shadow=True)
+
+
+def finalize_pr_plot(title, labels):
+    # plot no skill
+    baseline = random_performance_pr(labels)
+    plt.plot([0, 1], [baseline, baseline], linestyle='--',
+             label='Chance (AUC=%0.2f)' % baseline)
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    # plt.title('%s' % title)
+
+    # Add iso-f1 curves
+    f_scores = np.linspace(0.2, 0.8, num=4)
+    lines = []
+    labels = []
+    for f_score in f_scores:
+        x = np.linspace(0.01, 1)
+        y = f_score * x / (2 * x - f_score)
+        l, = plt.plot(x[y >= 0], y[y >= 0], color='gray', alpha=0.2)
+        plt.annotate('f1={0:0.1f}'.format(f_score), xy=(0.9, y[45] + 0.02))
+
+    # Remove whitespace and align at the origin
+    plt.xlim([0, 1.01])
+    plt.ylim([0, 1.01])
+    plt.tight_layout(rect=[0, 0.03, 1, 0.9])
+    plt.gca().set_aspect('equal', adjustable='box')
+    handles, labels = plt.gca().get_legend_handles_labels()
+    by_label = OrderedDict(zip(labels, handles))
+    plt.figlegend(by_label.values(), by_label.keys(), loc='lower center',
+                  ncol=2, fancybox=True, shadow=True)
 
 
 def display_sorted_feature_importance(agg_importances, feature_set):
@@ -101,10 +128,10 @@ def main(args):
 
     for model in models:
         saved_model = pickle.load(open(model["model_path"], "rb"))
-
         test = pickle.load(open(model["data_path"], "rb"))
+        take_mean = True if model["take_mean"] == "true" else False
 
-        if args.take_mean:
+        if model["take_mean"] == "true":
             for bag in test:
                 bag.instances = np.mean(bag.instances, axis=0)
 
@@ -134,10 +161,10 @@ def main(args):
             precision_recall_fscore_support(labels, predictions,
                                             average="binary")
         conf_matrix = confusion_matrix(labels, predictions)
-
         # TPR - TP / (TP+FN)
         true_positive_rate = conf_matrix[1][1] / (conf_matrix[1][1] +
                                                   conf_matrix[1][0])
+
         # FPR - FP / (FP+TN)
         false_positive_rate = conf_matrix[0][1] / (conf_matrix[0][1] +
                                                   conf_matrix[0][0])
@@ -164,10 +191,10 @@ def main(args):
                 feature_importances = saved_model.feature_importances_
 
             agg_importances = aggregate_feature_importance(
-                model, feature_importances, args.take_mean)
+                model, feature_importances, take_mean)
             feature_set = model["feature_set"]
+            print("Feature Importance")
             display_sorted_feature_importance(agg_importances, feature_set)
-
 
         # Load in cv_results if available
         if args.sklearn:
@@ -180,14 +207,20 @@ def main(args):
                 probabilities = saved_model.predict_proba(bags)[:, 1]
                 fpr, tpr, thresholds = roc_curve(labels, probabilities, pos_label=1)
                 roc_auc = auc(fpr, tpr)
+                print("ROC AUC=%.5f" % roc_auc)
                 plot_roc_curve(fpr, tpr, label="%s (AUC=%0.2f)" %
-                                               (model["description"], roc_auc),
-                               tuning_lib=model["tuning_lib"])
+                                               (model["description"], roc_auc))
             except Exception as err:
                 print(err.__str__())
 
         elif args.viz == "P-R_curves":
             try:
+                probabilities = saved_model.predict_proba(bags)[:, 1]
+                precision, recall, thresholds = precision_recall_curve(labels,
+                                                                       probabilities,
+                                                                       pos_label=1)
+                pr_auc = auc(recall, precision)
+                print("P-R AUC=%.5f" % pr_auc)
                 plot_pr_curve(recall=recall, precision=precision,
                               label="%s (AUC=%0.2f)" %
                                     (model["description"], pr_auc))
@@ -207,7 +240,7 @@ def main(args):
                 feature_importances = saved_model.feature_importances_
 
             agg_importances = aggregate_feature_importance(
-                model, feature_importances, args.take_mean)
+                model, feature_importances, take_mean)
             display_sorted_feature_importance(agg_importances, feature_set)
 
             exp_importances[model["description"]] = agg_importances
@@ -236,9 +269,5 @@ if __name__ == "__main__":
     parser.add_argument("--sklearn", action='store_true', default=True,
                         help="If trained using sklearn, there should be "
                              "cv_results.csv with additional metrics...")
-    parser.add_argument("--take_mean", action='store_true', default=False,
-                        help="Use the feature mean for each bag as one "
-                             "instance (as opposed to stacking multiple "
-                             "instances as the input to the model).")
 
     main(parser.parse_args())
