@@ -84,7 +84,7 @@ def read_hexoskin_data(df_map):
     return df_map
 
 
-def parse_from_files(args):
+def parse_from_files():
     df_map = OrderedDict()
 
     # Read in Android data
@@ -156,7 +156,7 @@ def main(args):
     # Change to participant's hexoskin directory
     os.chdir(args.participant_dir)
 
-    df_map = parse_from_files(args)
+    df_map = parse_from_files()
 
     # Merge and align all dataframes.
     combined_df = alignment.merge_dataframes(df_map, timedelta(seconds=1))
