@@ -170,6 +170,6 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("participant_dir", type=str,
-                        help="Directory containing hexoskin records.")
+                        help="Directory containing all participant data.")
 
     main(parser.parse_args())
