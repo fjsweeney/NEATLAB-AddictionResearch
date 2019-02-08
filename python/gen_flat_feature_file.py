@@ -5,7 +5,7 @@ import os
 import pandas as pd
 from SensorPreprocessing import alignment, qa
 
-
+# TODO: (TW) Make these args to the program
 HEXOSKIN_FEATURE_SET = "/home/webert3/smoking_viz_data/hexoskin_feature_set"
 ANDROID_FEATURE_SET = "/home/webert3/smoking_viz_data/android_feature_set"
 
@@ -21,6 +21,7 @@ def read_android_data(df_map):
     Returns:
         (dict) Updated df_map with Android feature DataFrames
     """
+    # NOTE: This assumes EMA data is stored in subdirectory 'ema'
     os.chdir("ema")
     print("Loading Android data...")
 
@@ -49,6 +50,7 @@ def read_hexoskin_data(df_map):
         Returns:
             (dict) Updated df_map with Hexoskin feature DataFrames
         """
+    # NOTE: This assumes Hexoskin data is stored in subdirectory 'hexoskin'
     os.chdir('hexoskin')
     print("Loading Hexoskin data...")
 

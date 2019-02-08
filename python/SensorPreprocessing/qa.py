@@ -3,6 +3,9 @@ import pandas as pd
 # RR interval quality constants
 UNRELIABLE_RR = 0x80
 NOISY_RR = 0x01  # QRS detected in signal with noise
+
+# NOTE: (TW) These are the quality bits that I have deemed important. If any of
+#       these bits are flipped in the quality score, the reading is unreliable.
 rr_qa_constants = [UNRELIABLE_RR]
 
 # Breathing rate quality constants
@@ -12,6 +15,9 @@ RESP_STATUS_BASELINE_A = 0x04  # Resp A baseline has changed.
 RESP_STATUS_BASELINE_B = 0x08  # Resp B baseline has changed.
 RESP_STATUS_NOISY_A = 0x10  # Resp A has high frequency content.
 RESP_STATUS_NOISY_B = 0x20  # Resp B has high frequency content.
+
+# NOTE: (TW) These are the quality bits that I have deemed important. If any of
+#       these bits are flipped 
 br_qa_constants = [RESP_STATUS_NO_A, RESP_STATUS_NO_B, RESP_STATUS_BASELINE_A,
                    RESP_STATUS_BASELINE_B]
 

@@ -6,11 +6,12 @@ saved_experiments/
 *.json
 *.csv
 commands
-
+tags
 
 # ANDROID
 # Built application files
-/*/build/
+android/*/build/
+android/*/app/release/
 
 # Crashlytics configuations
 com_crashlytics_export_strings.xml
