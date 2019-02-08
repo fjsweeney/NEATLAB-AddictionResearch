@@ -6,11 +6,21 @@ import numpy as np
 from scipy import stats
 from SensorPreprocessing import hrv
 
-# Hard coding for now...
+# TODO: (TW) Hard coding for now... Could be a program arg.
 SENSOR_FILENAME = 'all_data_cleaned.csv'
 
 
 def gen_header(features):
+    """
+    For each quantitative feature compute the following five statistics over the
+    minute time interval.
+
+    Args:
+        features (list): Column names for all features.
+
+    Returns:
+        (list) List of new features to be included in the min_to_min dataframe.
+    """
     new_features = []
     for feature in features:
         new_features.append("%s_mean" % feature)
@@ -23,6 +33,22 @@ def gen_header(features):
 
 
 def aggregate_by_minute(df, epsilon):
+    """
+    Aggregate quantitative data by minute. 
+
+    Args:
+        df (DataFrame): DataFrame containing data that is not yet aggregated.
+        epsilon (float): Percent of data that needs to be available to aggregate
+        that minute. E.g. epsilon=0.25 would require at least 25% of the seconds
+        within a given minute (i.e. 15 seconds) to have valid data for that
+        feature, otherwise it will be considered unreliable and not included in
+        the aggregated dataset (i.e. it would show up as 'NA' in the aggregated
+        DataFrame).
+
+    Returns:
+        (DataFrame) A new DataFrame with all features aggregated at a minute
+        resolution. 
+    """
     # Create a enumerated index column to ensure proper indexing
     df = df.set_index(np.arange(0, df.shape[0], 1))
 
@@ -57,7 +83,10 @@ def aggregate_by_minute(df, epsilon):
         for feature in features:
             mask = (subset[feature] != -1)
             values = subset.loc[mask][feature].values
-
+            
+            # NOTE: If values contains less 'threshold' values the data is
+            # considered unreliable, and will feature will be 'NA' for that
+            # time step.
             if len(values) > threshold:
                 new_df["%s_mean" % feature].iat[row_idx] = np.mean(values)
                 new_df["%s_std" % feature].iat[row_idx] = np.std(values)
@@ -78,14 +107,20 @@ def aggregate_by_minute(df, epsilon):
 
 
 def add_standard_scores(df):
+    """
+    Computes the z-score (i.e. standard score) for each feature mean.
+    """
     feature_means = [feature for feature in list(df) if feature.endswith('mean')]
     feature_means.append("hrv")
 
     # Compute the standard score for all mean values (and HRV),
     # ignoring missing data.
     for feature in feature_means:
-        # Create new feature column
+        # Create new feature column 
         if feature == "hrv":
+            # NOTE: (TW) This was a quick fix to handle misnaming the hrv
+            # feature in a different script. Can be removed if this code is
+            # never reached.
             colname = "hrv_zscore"
         else:
             colname = feature.replace("mean", "zscore")
@@ -123,7 +158,7 @@ def parse_from_files():
         # Aggregate
         df = aggregate_by_minute(df, epsilon=0.25)
 
-        # Add features
+        # Add derived features
         df = add_standard_scores(df)
 
         # Write aggregated dataframe to file, add to map.
@@ -136,10 +171,14 @@ def parse_from_files():
 
 
 def main(args):
-    # Change to participant's hexoskin directory
+    # Change to participant's data directory
     os.chdir(args.base_dir)
 
     df_map = parse_from_files()
+
+    # TODO: (TW) Write all aggregated participant data to a single flat file
+    # with <pid, timestamp> as the primary key. This is currently done in a
+    # separate script...
 
     print('Done')
 
@@ -147,6 +186,6 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("base_dir", type=str,
-                        help="Directory containing participant data.")
+                        help="Directory containing ALL participant data.")
 
     main(parser.parse_args())
