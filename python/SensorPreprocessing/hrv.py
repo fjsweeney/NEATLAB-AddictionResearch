@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def gen_hrv_by_window(df, delta, method, epsilon):
+def gen_hrv_by_window(df, delta, method="rmssd", epsilon=0.01):
     """
     Generate HRV values over a caller-specified timedelta taking a sliding
     window approach.
