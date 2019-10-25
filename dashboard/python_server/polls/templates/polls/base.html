@@ -37,7 +37,7 @@
                                 <a href="#" class="dropdown-item">Add</a>
                             </div>
                         </li> {% endcomment %}
-                        {% if not user.username %}
+                        {% if not user.is_authenticated %}
                             <li class="nav-item">
                                 <a href="{% url 'polls:login' %}" class="nav-link">Login</a>
                             </li>
@@ -46,7 +46,7 @@
                             </li>
                         {% else %}
                             <li class="nav-item">
-                                <a href="{% url 'polls:logout' %}" class="nav-link">Logout {{user.username}}</a>
+                                <a href="{% url 'polls:logout' %}" class="nav-link">Logout {{user.get_username}}</a>
                             </li>
                         {% endif %}
                         

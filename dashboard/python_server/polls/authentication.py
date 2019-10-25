@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 
@@ -37,12 +37,14 @@ def login_post(request):
     if user is not None:
         auth_login(request, user)
         #redirect to success page
-        return render(request, 'polls/index.html', {'user': user})
+        #return render(request, 'polls/index.html', {'user': user})
+        return redirect('/polls')
     else:
         #redirect with error msg.
-        return render(request, 'polls/login.html')
+        return redirect('/polls/login')
+
 
 
 def logout(request):
     auth_logout(request)
-    return render(request, 'polls/index.html')
+    return redirect('/polls')
