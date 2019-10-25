@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 
 # Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect
@@ -34,6 +35,26 @@ def register_post(request):
     }
 
     return render(request, 'polls/register_success.html', context)
+
+def login(request):
+    return render(request, 'polls/login.html');
+
+def login_post(request):
+    email = request.POST['email']
+    password = request.POST['password']
+
+    user = authenticate(request, username=email, password=password)
+    if user is not None:
+        auth_login(request, user)
+        #redirect to success page
+        return render(request, 'polls/index.html', {'user' : user})
+    else:
+        #redirect with error msg.
+        return render(request, 'polls/login.html')
+
+def logout(request):
+    auth_logout(request)
+    return render(request, 'polls/index.html')
 
 def detail(request, question_id):
     # response = "You're looking at question %s." % question_id
