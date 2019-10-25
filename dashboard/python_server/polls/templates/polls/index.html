@@ -1,4 +1,34 @@
-{% load static %}
+{% extends "polls/base.html" %}
+
+{% block content %}
+    <div class="container">
+        <h1>patchScriptUI</h1>
+        <p class="lead">A UI framework for people who already know JavaScript DOM manipulation and event handling. <br>(Try clicking around)</p>
+      </div>
+
+      <div class="row">
+        <!-- Component Placeholders that won't get rendered to the page unless you 
+             attach a component to them -->
+        <div class="col-sm-6" id="renderHere"></div>
+        <div class="col-sm-6" id="renderHere2"></div>
+        <div class="col-sm-12" id="favoriteTreats"></div>
+        <hr>
+        <div class="col-sm-12" id="powersOfTwo"></div>
+        <div class="col-sm-12" id="colorChanger"></div>
+        <div class="col-sm-12" id="colorChangerContainer"></div>
+        <div class="col-sm-6" id="loginForm"></div>
+        <div class="col-sm-6" id="anotherLogin"></div>
+
+      </div>
+    </main><!-- /.container -->
+{% endblock %}
+
+
+
+
+
+
+{% comment %} {% load static %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}">
 
@@ -10,4 +40,4 @@
     </ul>
 {% else %}
     <p>No polls are available</p>
-{% endif %}
+{% endif %} {% endcomment %}

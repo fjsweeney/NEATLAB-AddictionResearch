@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.models import User
 
 # Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect
@@ -18,6 +19,21 @@ def index(request):
     return render(request, 'polls/index.html', context)
     # output = ', '.join([q.question_text for q in latest_question_list])
     # return HttpResponse(output)
+
+def register(request):
+    return render(request, 'polls/register.html');
+
+def register_post(request):
+    email = request.POST['email']
+    password = request.POST['password']
+
+    user = User.objects.create_user(email, email, password)
+
+    context = {
+        'user' : user
+    }
+
+    return render(request, 'polls/register_success.html', context)
 
 def detail(request, question_id):
     # response = "You're looking at question %s." % question_id
