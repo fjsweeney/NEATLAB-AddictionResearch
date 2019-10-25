@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
+  {% load static %}
   <!--  Meta  -->
   <meta charset="UTF-8" />
   <title>{% block title %}Smoking_Cessation{% endblock %}</title>
@@ -64,7 +64,7 @@
   <!-- Library file -->
   {% comment %} <script src="lib/patchScriptUI.js"></script> {% endcomment %}
   <!-- End Framework files -->
-
+  <script src="{% static 'polls/scripts/libs/patchScriptUI.js' %}"></script>
   <!-- Supplemental Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
