@@ -1,23 +1,20 @@
 {% extends "polls/base.html" %}
 
+{% load static %}
+
+{% block styles %}
+  <link rel="stylesheet" type="text/css" href="{% static 'polls/css/style.css' %}">    
+{% endblock %}
+
 {% block content %}
-    <div class="container">
-        <h1>Smoking_Cessation</h1>
-        <p class="lead">A dashboard tool to analyze smoking data with assistance from state of the art machine learning models!</p>
-      </div>
+    <div class="jumbotron" id="heroImage">
+        <h1 id="heroHeader">Smoking_Cessation</h1>
+        <p class="lead" id="heroText">A dashboard tool to analyze smoking data with assistance from state of the art machine learning models!</p>
+    </div>
 
       <div class="row">
         <!-- Component Placeholders that won't get rendered to the page unless you 
              attach a component to them -->
-        <div class="col-sm-6" id="renderHere"></div>
-        <div class="col-sm-6" id="renderHere2"></div>
-        <div class="col-sm-12" id="favoriteTreats"></div>
-        <hr>
-        <div class="col-sm-12" id="powersOfTwo"></div>
-        <div class="col-sm-12" id="colorChanger"></div>
-        <div class="col-sm-12" id="colorChangerContainer"></div>
-        <div class="col-sm-6" id="loginForm"></div>
-        <div class="col-sm-6" id="anotherLogin"></div>
 
       </div>
     </main><!-- /.container -->

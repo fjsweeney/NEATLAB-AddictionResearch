@@ -20,10 +20,13 @@ def register_post(request):
 
     user = User.objects.create_user(email, email, password)
 
+    #Then log user in.
+    authenticate(request, username=email, password=password)
+
     context = {
         'user': user
     }
-
+    
     return render(request, 'polls/register_success.html', context)
 
 def login(request):
