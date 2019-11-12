@@ -2,6 +2,7 @@ import argparse
 import os
 import pandas as pd
 import numpy as np
+import pickle
 
 from Models.Preprocessing.Bag import Bag
 from sklearn.preprocessing import MinMaxScaler
