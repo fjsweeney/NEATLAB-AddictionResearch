@@ -1,4 +1,4 @@
 gather data
-flat features
-gen min-to-min
-gen bags
+flat features [participant directory]
+gen min-to-min [all_participants directory]
+gen bags [all_participants directory] --pct_test [percent in test] --bag_interval [# in minutes]
