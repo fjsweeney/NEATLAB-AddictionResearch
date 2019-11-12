@@ -1,0 +1,7 @@
+Steps:
+0) gather data
+1) flat features [participant directory]
+2) gen min-to-min [all_participants directory]
+3) gen bags [all_participants directory] --pct_test [percent in test] --bag_interval [# in minutes]
+4) Take those pickles and run it on a model with trainer.py
+eg: python trainer.py --train ~/smoking_data/train_intv\=60_min.pkl --sklearn 1 --take_mean --model RF --bag_interval 60
