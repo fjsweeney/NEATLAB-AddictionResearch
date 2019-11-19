@@ -21,8 +21,15 @@ def index(request):
     # output = ', '.join([q.question_text for q in latest_question_list])
     # return HttpResponse(output)
 
+#dashView test
+def dashView(request):
+    return render(request, 'polls/dashview.html')
+
+def tableView(request):
+    return render(request, 'polls/tableview.html')
+
 def register(request):
-    return render(request, 'polls/register.html');
+    return render(request, 'polls/register.html')
 
 def register_post(request):
     email = request.POST['email']

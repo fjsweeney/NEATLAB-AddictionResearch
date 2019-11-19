@@ -10,6 +10,8 @@ from . import modelExecution
 app_name = 'polls'
 urlpatterns = [
     path('', views.index, name='index'),
+    path('testDash', views.dashView, name="dashView"),
+    path('tableView', views.tableView, name="tableView"),
     path('register', authentication.register, name="register"),
     path('registerPOST', authentication.register_post, name="registerPOST"),
     path('login', authentication.login, name="login"),
