@@ -13,8 +13,12 @@ urlpatterns = [
     path('testDash', views.dashView, name="dashView"),
     path('tableView', views.tableView, name="tableView"),
     path('register', authentication.register, name="register"),
+    path('dashRegister', views.dashRegister, name="dashRegister"),
+
     path('registerPOST', authentication.register_post, name="registerPOST"),
     path('login', authentication.login, name="login"),
+    path('dashLogin', views.dashLogin, name="dashLogin"),
+
     path('loginPOST', authentication.login_post, name="loginPOST"),
     path('logout', authentication.logout, name="logout"),
 
