@@ -15,6 +15,8 @@ urlpatterns = [
     path('register', authentication.register, name="register"),
     path('dashRegister', views.dashRegister, name="dashRegister"),
 
+    path('fileUpload', views.fileUpload, name="fileUpload"),
+
     path('registerPOST', authentication.register_post, name="registerPOST"),
     path('login', authentication.login, name="login"),
     path('dashLogin', views.dashLogin, name="dashLogin"),

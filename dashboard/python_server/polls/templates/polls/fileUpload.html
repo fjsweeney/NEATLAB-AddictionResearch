@@ -1,0 +1,11 @@
+{% extends "polls/dashBase.html" %}
+
+{% block content %}
+
+
+<form action="{% url 'polls:fileUpload' %}" method="POST">
+    <label for="uploadFile">Upload File</label>
+    <input type="file" name="uploadFile">
+</form>
+
+{% endblock content %}

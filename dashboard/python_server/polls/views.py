@@ -18,10 +18,14 @@ def index(request):
     #     'latest_question_list': latest_question_list,
     # }
     if(request.user.is_authenticated):
-        return render(request, 'polls/dashView.html')
+        return render(request, '/polls/dashView.html')
     return redirect('/polls/dashLogin')
     # output = ', '.join([q.question_text for q in latest_question_list])
     # return HttpResponse(output)
+
+
+def fileUpload(request):
+    return render(request, 'polls/fileUpload.html')
 
 #dashView test
 def dashView(request):
