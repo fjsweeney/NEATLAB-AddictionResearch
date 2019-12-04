@@ -2,11 +2,21 @@
 
 {% block content %}
 
+<h1>Clustering Algorithm File Upload</h1>
+<h3>Requirements:</h3>
+<ul>
+    <li>A .csv file representing your location data</li>
+    <li>A .csv file representing your smoking reports</li>
+</ul>
 
 <form action="{% url 'polls:fileUploadPOST' %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    <label for="uploadFile">Upload File</label>
-    <input type="file" name="uploadFile">
+    <label for="locationFile">Location File</label>
+    <input type="file" name="locationFile" required>
+
+    <label for="smokingReportFile">Smoking Report File</label>
+    <input type="file" name="smokingReportFile" required>
+
     <button>Submit</button>
 </form>
 

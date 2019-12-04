@@ -2,19 +2,19 @@
 
 {% block content %}
 
-{% for uploadedFile in uploadedFiles.all %}
-    <label for="{{ uploadedFile.uploadFile.name }}">{{ uploadedFile.uploadFile.name }}</label>
+{% for clusterFileUpload in clusterFiles.all %}
+    <label for="{{ clusterFileUpload.locationFile.name }}">{{ clusterFileUpload.locationFile.name }}</label>
 
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-left-primary shadow h-100 py-2">
         <div class="card-body">
             <div class="row no-gutters align-items-center">
             <div class="col mr-2">
-                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ uploadedFile.uploadFile.name }}</div>
-                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ uploadedFile.uploadDate }}</div>
-            </div>
-            <div class="col-auto">
-                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ clusterFileUpload.locationFile.name }}</div>
+
+                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ clusterFileUpload.smokingReportFile.name }}</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ clusterFileUpload.uploadDate }}</div>
+
             </div>
             </div>
         </div>

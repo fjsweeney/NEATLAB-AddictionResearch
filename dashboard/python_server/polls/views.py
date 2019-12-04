@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.http import HttpResponse, HttpResponseRedirect
 # from django.template import loader
 from django.urls import reverse
-from .models import Question, Choice, UploadedFile, models
+from .models import Question, Choice, UploadedFile, models, ClusterFileUpload
 
 def index(request):
     # latest_question_list = Question.objects.order_by('-pub_date')[:5]
@@ -28,15 +28,20 @@ def fileUpload(request):
     return render(request, 'polls/fileUpload.html')
 
 #save the uploaded file with the current user's ID
+# def fileUploadPOST(request):
+#     file = UploadedFile.objects.create(uploadFile=request.FILES['uploadFile'], ownerID=request.user.id)
+#     file.save()
+#     return redirect('/polls/user/fileUploadList')
+
 def fileUploadPOST(request):
-    file = UploadedFile.objects.create(uploadFile=request.FILES['uploadFile'], ownerID=request.user.id)
-    file.save()
-    return redirect(request, '/polls/user/fileUploadList');
+    clusterFile = ClusterFileUpload.objects.create(locationFile=request.FILES['locationFile'], smokingReportFile=request.FILES['smokingReportFile'], ownerID=request.user.id)
+    clusterFile.save()
+    return redirect('/polls/user/fileUploadList')
 
 def fileUploadList(request):
     
     context = {
-        'uploadedFiles' : UploadedFile.objects.filter(ownerID=request.user.id)
+        'clusterFiles' : ClusterFileUpload.objects.filter(ownerID=request.user.id)
     }
     
     return render(request, 'polls/fileUploadList.html', context)
