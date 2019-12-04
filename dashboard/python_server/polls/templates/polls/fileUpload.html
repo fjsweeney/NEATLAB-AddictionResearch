@@ -3,9 +3,11 @@
 {% block content %}
 
 
-<form action="{% url 'polls:fileUpload' %}" method="POST">
+<form action="{% url 'polls:fileUploadPOST' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
     <label for="uploadFile">Upload File</label>
     <input type="file" name="uploadFile">
+    <button>Submit</button>
 </form>
 
 {% endblock content %}

@@ -16,6 +16,10 @@ urlpatterns = [
     path('dashRegister', views.dashRegister, name="dashRegister"),
 
     path('fileUpload', views.fileUpload, name="fileUpload"),
+    path('fileUploadPOST', views.fileUploadPOST, name="fileUploadPOST"),
+
+    path('user/fileUploadList', views.fileUploadList, name="fileUploadList"),
+
 
     path('registerPOST', authentication.register_post, name="registerPOST"),
     path('login', authentication.login, name="login"),

@@ -26,5 +26,6 @@ class Choice(models.Model):
         return self.choice_text
 
 class UploadedFile(models.Model):
-    file = models.FileField(upload_to=None)
-    ownerId = models.CharField(max_length=200)
+    uploadFile = models.FileField()
+    uploadDate = models.DateTimeField(auto_now_add=True)
+    ownerID = models.IntegerField()

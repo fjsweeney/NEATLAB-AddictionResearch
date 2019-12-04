@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.http import HttpResponse, HttpResponseRedirect
 # from django.template import loader
 from django.urls import reverse
-from .models import Question, Choice
+from .models import Question, Choice, UploadedFile, models
 
 def index(request):
     # latest_question_list = Question.objects.order_by('-pub_date')[:5]
@@ -18,7 +18,7 @@ def index(request):
     #     'latest_question_list': latest_question_list,
     # }
     if(request.user.is_authenticated):
-        return render(request, '/polls/dashView.html')
+        return render(request, 'polls/dashview.html')
     return redirect('/polls/dashLogin')
     # output = ', '.join([q.question_text for q in latest_question_list])
     # return HttpResponse(output)
@@ -26,6 +26,21 @@ def index(request):
 
 def fileUpload(request):
     return render(request, 'polls/fileUpload.html')
+
+#save the uploaded file with the current user's ID
+def fileUploadPOST(request):
+    file = UploadedFile.objects.create(uploadFile=request.FILES['uploadFile'], ownerID=request.user.id)
+    file.save()
+    return redirect(request, '/polls/user/fileUploadList');
+
+def fileUploadList(request):
+    
+    context = {
+        'uploadedFiles' : UploadedFile.objects.filter(ownerID=request.user.id)
+    }
+    
+    return render(request, 'polls/fileUploadList.html', context)
+
 
 #dashView test
 def dashView(request):
