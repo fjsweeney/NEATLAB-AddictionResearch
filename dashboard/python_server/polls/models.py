@@ -24,3 +24,14 @@ class Choice(models.Model):
 
     def __str__(self):
         return self.choice_text
+
+class UploadedFile(models.Model):
+    uploadFile = models.FileField()
+    uploadDate = models.DateTimeField(auto_now_add=True)
+    ownerID = models.IntegerField()
+
+class ClusterFileUpload(models.Model):
+    locationFile = models.FileField()
+    smokingReportFile = models.FileField()
+    uploadDate = models.DateTimeField(auto_now_add=True)
+    ownerID = models.IntegerField()

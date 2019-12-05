@@ -17,7 +17,7 @@
   <nav class="navbar navbar-expand-sm navbar-dark bg-primary mb-3">
         <div class="container">
             {% if user.is_authenticated %}
-                <span class="navbar-brand" id="loggedInHeaderDropdown">Dashboard</span>
+                <span class="navbar-brand" id="loggedInHeaderDropdown"></span>
             {% else %}
                 <a class="navbar-brand" href="/polls">Home</a>
             {% endif %}
@@ -59,7 +59,7 @@
             </div>
         </div>
     </nav>
-    
+
     {% block content %}{% endblock %}
 
 

@@ -21,3 +21,8 @@ li a
     background:rgb(245, 245, 220, .7);
     color:red;
 }
+
+.upload-button
+{
+    transform: rotateX(180deg);
+}

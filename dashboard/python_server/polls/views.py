@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 
@@ -9,20 +9,59 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.http import HttpResponse, HttpResponseRedirect
 # from django.template import loader
 from django.urls import reverse
-from .models import Question, Choice
+from .models import Question, Choice, UploadedFile, models, ClusterFileUpload
 
 def index(request):
-    latest_question_list = Question.objects.order_by('-pub_date')[:5]
+    # latest_question_list = Question.objects.order_by('-pub_date')[:5]
     # template = loader.get_template('polls/index.html')
-    context = {
-        'latest_question_list': latest_question_list,
-    }
-    return render(request, 'polls/index.html', context)
+    # context = {
+    #     'latest_question_list': latest_question_list,
+    # }
+    if(request.user.is_authenticated):
+        return render(request, 'polls/dashview.html')
+    return redirect('/polls/dashLogin')
     # output = ', '.join([q.question_text for q in latest_question_list])
     # return HttpResponse(output)
 
+
+def fileUpload(request):
+    return render(request, 'polls/fileUpload.html')
+
+#save the uploaded file with the current user's ID
+# def fileUploadPOST(request):
+#     file = UploadedFile.objects.create(uploadFile=request.FILES['uploadFile'], ownerID=request.user.id)
+#     file.save()
+#     return redirect('/polls/user/fileUploadList')
+
+def fileUploadPOST(request):
+    clusterFile = ClusterFileUpload.objects.create(locationFile=request.FILES['locationFile'], smokingReportFile=request.FILES['smokingReportFile'], ownerID=request.user.id)
+    clusterFile.save()
+    return redirect('/polls/user/fileUploadList')
+
+def fileUploadList(request):
+    
+    context = {
+        'clusterFiles' : ClusterFileUpload.objects.filter(ownerID=request.user.id)
+    }
+    
+    return render(request, 'polls/fileUploadList.html', context)
+
+
+#dashView test
+def dashView(request):
+    return render(request, 'polls/dashview.html')
+
+def tableView(request):
+    return render(request, 'polls/tableview.html')
+
+def dashLogin(request):
+    return render(request, 'polls/dashLogin.html')
+
 def register(request):
-    return render(request, 'polls/register.html');
+    return render(request, 'polls/register.html')
+
+def dashRegister(request):
+    return render(request, 'polls/dashRegister.html')
 
 def register_post(request):
     email = request.POST['email']
@@ -47,7 +86,7 @@ def login_post(request):
     if user is not None:
         auth_login(request, user)
         #redirect to success page
-        return render(request, 'polls/index.html', {'user' : user})
+        return render(request, 'polls/dashview.html', {'user' : user})
     else:
         #redirect with error msg.
         return render(request, 'polls/login.html')
