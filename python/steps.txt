@@ -13,3 +13,9 @@ eg: python gen_bag.py ~/smoking_data --pct_test .1 --bag_interval 30
 
 4) Take those pickles and run it on a model with trainer.py
 eg: python trainer.py --train ~/smoking_data/train_intv\=60_min.pkl --sklearn 1 --take_mean --model RF --bag_interval 60
+
+
+5) Test the saved model with inference.py
+
+Note: For some reason, this doesn't work, not sure why. Looking into this.
+eg: python inference.py --model "saved_models/RF/intv=15/2019-11-12_13:20:12/model.pkl" --test ~/smoking_data/test_intv\=15_min.pkl
