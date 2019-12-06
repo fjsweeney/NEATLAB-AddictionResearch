@@ -2,22 +2,31 @@
 
 {% block content %}
 
-<h1>Clustering Algorithm File Upload</h1>
-<h3>Requirements:</h3>
-<ul>
-    <li>A .csv file representing your location data</li>
-    <li>A .csv file representing your smoking reports</li>
-</ul>
+<!-- Begin Page Content -->
+<div class="container-fluid">
 
-<form action="{% url 'polls:fileUploadPOST' %}" method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <label for="locationFile">Location File</label>
-    <input type="file" name="locationFile" required>
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h1 mb-0 text-gray-800">Clustering Algorithm File Upload</h1>
+    </div>
 
-    <label for="smokingReportFile">Smoking Report File</label>
-    <input type="file" name="smokingReportFile" required>
+    <h3>Requirements:</h3>
+    <ul>
+        <li>A .csv file representing your location data</li>
+        <li>A .csv file representing your smoking reports</li>
+    </ul>
 
-    <button>Submit</button>
-</form>
+    <form action="{% url 'polls:fileUploadPOST' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="locationFile">Location File</label>
+        <input type="file" name="locationFile" required>
+
+        <label for="smokingReportFile">Smoking Report File</label>
+        <input type="file" name="smokingReportFile" required>
+
+        <button>Submit</button>
+    </form>
+
+</div>
 
 {% endblock content %}

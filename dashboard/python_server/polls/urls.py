@@ -18,7 +18,7 @@ urlpatterns = [
     path('fileUpload', views.fileUpload, name="fileUpload"),
     path('fileUploadPOST', views.fileUploadPOST, name="fileUploadPOST"),
 
-    path('user/fileUploadList', views.fileUploadList, name="fileUploadList"),
+    path('fileUploadList', views.fileUploadList, name="fileUploadList"),
 
 
     path('registerPOST', authentication.register_post, name="registerPOST"),

@@ -2,25 +2,35 @@
 
 {% block content %}
 
-{% for clusterFileUpload in clusterFiles.all %}
-    <label for="{{ clusterFileUpload.locationFile.name }}">{{ clusterFileUpload.locationFile.name }}</label>
+<!-- Begin Page Content -->
+<div class="container-fluid">
 
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
-        <div class="card-body">
-            <div class="row no-gutters align-items-center">
-            <div class="col mr-2">
-                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ clusterFileUpload.locationFile.name }}</div>
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Previously Uploaded Datasets</h1>
+        <a href="{% url 'polls:fileUpload' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50 upload-button"></i> Upload Data</a>
+        </div>
 
-                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ clusterFileUpload.smokingReportFile.name }}</div>
-                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ clusterFileUpload.uploadDate }}</div>
+    {% for clusterFileUpload in clusterFiles.all %}
+        <label for="{{ clusterFileUpload.locationFile.name }}">{{ clusterFileUpload.locationFile.name }}</label>
 
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ clusterFileUpload.locationFile.name }}</div>
+
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ clusterFileUpload.smokingReportFile.name }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ clusterFileUpload.uploadDate }}</div>
+
+                </div>
+                </div>
             </div>
             </div>
         </div>
-        </div>
-    </div>
-    <br/>
-{% endfor %}
+        <br/>
+    {% endfor %}
+</div>
 
 {% endblock content %}
