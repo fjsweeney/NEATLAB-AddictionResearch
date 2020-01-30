@@ -138,12 +138,14 @@ def add_standard_scores(df):
     return df
 
 
-def parse_from_files():
+def parse_from_files(args):
     df_map = OrderedDict()
 
     # Get each participant directory
-    participants = [filename for filename in os.listdir('./') if
+    participants = [filename for filename in os.listdir(args.base_dir) if
                     filename.startswith('participant')]
+
+    print(args.base_dir)
 
     for participant in participants:
         print("Aggregating data for %s..." % participant)
@@ -165,6 +167,8 @@ def parse_from_files():
         df.to_csv("all_features_min-to-min.csv", na_rep='NA')
         df_map[pid] = df
 
+        print(df_map)
+
         os.chdir("../")
 
     return df_map
@@ -174,12 +178,13 @@ def main(args):
     # Change to participant's data directory
     os.chdir(args.base_dir)
 
-    df_map = parse_from_files()
+    df_map = parse_from_files(args)
 
     # TODO: (TW) Write all aggregated participant data to a single flat file
     # with <pid, timestamp> as the primary key. This is currently done in a
     # separate script...
 
+    
     print('Done')
 
 

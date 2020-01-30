@@ -147,11 +147,22 @@ def main(args):
     print("Total number of test bags=%d." % len(all_test_bags))
 
     # Move some bags to training set to put closer to 15% validation
+    # TODO shift a percentage of the bags?
     print("Shifting pid=%s to the training set" % largest_validation_pid)
-    shift_bags = [x for x in all_test_bags if x.pid == largest_validation_pid]
+    # shift_bags = [x for x, i in all_test_bags if (x.pid == largest_validation_pid and i < (args.pct_test * len(all_test_bags)))]
+    shift_bags = []
+    new_test_bags = []
+    for x in all_test_bags:
+        if (x.pid == largest_validation_pid and len(shift_bags) < ((1 - args.pct_test) * len(all_test_bags))):
+            shift_bags.append(x)
+        else:
+            new_test_bags.append(x)
+
     all_train_bags += shift_bags
-    all_test_bags = [x for x in all_test_bags if x.pid !=
-                     largest_validation_pid]  # Remove shifted bags
+
+    all_test_bags = new_test_bags
+    # all_test_bags = [x for x in all_test_bags if x.pid !=
+    #                  largest_validation_pid]  # Remove shifted bags
 
     print("Total number of training bags=%d." % len(all_train_bags))
     print("Total number of test bags=%d." % len(all_test_bags))
