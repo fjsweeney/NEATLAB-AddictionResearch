@@ -154,6 +154,7 @@ def main(args):
     new_test_bags = []
     for x in all_test_bags:
         if (x.pid == largest_validation_pid and len(shift_bags) < ((1 - args.pct_test) * len(all_test_bags))):
+
             shift_bags.append(x)
         else:
             new_test_bags.append(x)
@@ -178,6 +179,7 @@ def main(args):
                                     args.bag_interval, "wb"))
 
     print('Done')
+    return "test_intv=" + args.bag_interval + "_min.pkl"
 
 
 if __name__ == "__main__":

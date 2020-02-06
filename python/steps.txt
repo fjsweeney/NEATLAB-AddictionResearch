@@ -17,5 +17,4 @@ eg: python trainer.py --train ~/smoking_data/train_intv\=60_min.pkl --sklearn 1 
 
 5) Test the saved model with inference.py
 
-Note: For some reason, this doesn't work, not sure why. Looking into this.
-eg: python inference.py --model "saved_models/RF/intv=15/2019-11-12_13:20:12/model.pkl" --test ~/smoking_data/test_intv\=15_min.pkl
+python3 inference.py --model ~/Research/smoking-intervention/python/Data/saved_models/RF/intv=30/2020-02-05_17:03:17/model.pkl --test ~/Research/smoking-intervention/python/Data/test_intv\=30_min.pkl

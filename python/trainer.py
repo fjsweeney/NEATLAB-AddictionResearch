@@ -128,6 +128,8 @@ def run_hyperopt_experiment(train, args):
     else:
         raise ValueError("Experiment class not found.")
 
+    return output_dir + "/model.pkl"
+
 
 def run_sklearn_experiment(train, args):
     if args.model == "RF":
@@ -173,6 +175,7 @@ def run_sklearn_experiment(train, args):
 
     else:
         raise ValueError("Experiment class not found.")
+    return output_dir + "/model.pkl"
 
 
 def export_experiment_results(exp, output_dir):
@@ -193,11 +196,12 @@ def main(args):
             bag.instances = np.mean(bag.instances, axis=0)
 
     if args.hyperopt:
-        run_hyperopt_experiment(train, args)
+        model_path = run_hyperopt_experiment(train, args)
     elif args.sklearn:
-        run_sklearn_experiment(train, args)
+        model_path = run_sklearn_experiment(train, args)
 
     print('Done')
+    return model_path
 
 
 if __name__ == "__main__":

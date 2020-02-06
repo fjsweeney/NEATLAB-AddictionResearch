@@ -76,9 +76,10 @@ def main(args):
     plot_roc_curves(fpr, tpr, label="Majority Class (AUC= % 0.2f)" % roc_auc)
 
     finalize_roc_plot()
-    plt.show()
+    plt.savefig('Output/inference_output.png')
 
     print('Done')
+    return my_precision, my_recall, my_f1_score, accuracy
 
 
 if __name__ == "__main__":
