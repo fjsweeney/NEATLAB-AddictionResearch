@@ -27,7 +27,7 @@ def register_post(request):
         'user': user
     }
     
-    return render(request, 'polls/dashView.html', context)
+    return render(request, 'polls/dashview.html', context)
 
 def login(request):
     return render(request, 'polls/login.html')

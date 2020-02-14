@@ -35,3 +35,8 @@ class ClusterFileUpload(models.Model):
     smokingReportFile = models.FileField()
     uploadDate = models.DateTimeField(auto_now_add=True)
     ownerID = models.IntegerField()
+
+class RF_Upload(models.Model):
+    participantFolder = models.FileField()
+    uploadDate = models.DateTimeField(auto_now_add=True)
+    ownerID = models.IntegerField()

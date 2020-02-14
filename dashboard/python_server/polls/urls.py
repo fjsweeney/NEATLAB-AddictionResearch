@@ -6,6 +6,7 @@ from django.contrib.auth import views as auth_views
 from . import views
 from . import authentication
 from . import modelExecution
+from . import modelUploads
 
 app_name = 'polls'
 urlpatterns = [
@@ -30,7 +31,9 @@ urlpatterns = [
 
 
     #model execution code
-    path('models', modelExecution.index, name="modelIndex")
+    path('models', modelExecution.index, name="modelIndex"),
+    path('polls/dataUploads/RF', modelUploads.random_forest, name="RF_Upload")
+
 
 
 

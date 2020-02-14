@@ -27,6 +27,19 @@
         <button>Submit</button>
     </form>
 
+    <h1 class="h1 mb-0 text-gray-800">Random Forest File Upload</h1>
+
+    <h3>Requirements:</h3>
+    <ul>
+        <li>Folder containing Participant data</li>
+    </ul>
+
+    <form action="% url 'polls/dataUploads/RF' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="locationFile">Participant Data Folder</label>
+        <input type="file" name="participantFolder" required>
+    </form>
+
 </div>
 
 {% endblock content %}
