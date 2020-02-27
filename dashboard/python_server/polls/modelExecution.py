@@ -13,6 +13,9 @@ from .models import Question, Choice
 
 from .python_ml import pipeline
 
+import argparse
+
+
 def index(request):
 
     if not request.user.is_authenticated:
@@ -22,8 +25,37 @@ def index(request):
 
 def modelExecutionPOST(request):
 
-    if not request.user.is_authenticated:
-        return redirect('/polls')
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("base_dir", type=str,
+                        help="Directory containing all participant data.")
+    parser.add_argument("bag_interval", type=str,
+                        help="Number of minutes for each bag.")
+    parser.add_argument("pct_test", type=float,
+                        help="Percent of data used for test set")
+    parser.add_argument("--train", type=str,
+                       help="File containing training data (a pkl)")
+    parser.add_argument("model", type=str,
+                        choices=["RF", "miSVM", "MISVM", "LRC", "GBC", 
+                        "SVM"],
+                        help="Model type")
+    parser.add_argument("--hyperopt", type=int,
+                        help="Number of hyperparameter iterations for "
+                             "hyperopt tuning.")
+    parser.add_argument("--sklearn", type=int,
+                        help="Number of hyperparameter iterations for sklearn "
+                             "tuning.")
+    parser.add_argument("--take_mean", action='store_true', default=False,
+                        help="Use the feature mean for each bag as one "
+                             "instance (as opposed to stacking multiple "
+                             "instances as the input to the model).")
+
+    # args = parser.parse_args(args=["./python_ml/Data", "5", ".2", "SVM", "--sklearn", "1"])
+
+    pipeline.main(['/home/weesp/Desktop/github_senior_proj/NEATLAB-AddictionResearch/dashboard/python_server/polls/python_ml/Data', '5', '.2', 'SVM', '--sklearn', '1'])
+
+    # if not request.user.is_authenticated:
+    #     return redirect('/polls')
     
 
 

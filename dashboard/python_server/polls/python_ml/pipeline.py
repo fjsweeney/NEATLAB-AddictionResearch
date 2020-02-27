@@ -13,7 +13,7 @@ import sys
 import os
 
 # python pipeline.py [path to smoking_data] 30 .1 RF --sklearn 1
-def main():
+def main(args):
     parser = argparse.ArgumentParser()
 
     parser.add_argument("base_dir", type=str,
@@ -49,11 +49,13 @@ def main():
     testParser.add_argument("--test", type=str,
                         help="File containing test data (a pkl)")                             
 
-    temp_args = parser.parse_args()
+    # temp_args = parser.parse_args(args=args)
     
-    train_pkl_path = temp_args.base_dir+"/train_intv=%s_min.pkl"%temp_args.bag_interval
-    test_pkl_path = temp_args.base_dir+"/test_intv=%s_min.pkl"%temp_args.bag_interval
-    args = parser.parse_args(args=[*sys.argv[1:], "--train", train_pkl_path])
+    train_pkl_path = args[0]+"/train_intv=%s_min.pkl"%args[1]
+    test_pkl_path = args[0]+"/test_intv=%s_min.pkl"%args[1]
+    # args = parser.parse_args(args=[*sys.argv[1:], "--train", train_pkl_path])
+    print(args)
+    args = parser.parse_args(args=[*args, "--train", train_pkl_path])
 
     # args = parser.parse_args(args=[*sys.argv[1:], "--train",train_pkl_path])
     print(args)
