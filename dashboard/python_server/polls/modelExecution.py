@@ -11,12 +11,19 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from .models import Question, Choice
 
+from .python_ml import pipeline
+
 def index(request):
 
     if not request.user.is_authenticated:
         return redirect('/polls')
     
     return render(request, 'polls/modelExecution/index.html')
+
+def modelExecutionPOST(request):
+
+    if not request.user.is_authenticated:
+        return redirect('/polls')
     
 
 

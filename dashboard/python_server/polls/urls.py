@@ -32,6 +32,8 @@ urlpatterns = [
 
     #model execution code
     path('models', modelExecution.index, name="modelIndex"),
+    path('models/execution', modelExecution.modelExecutionPOST, name="modelExecutionPOST"),
+
     path('polls/dataUploads/RF', modelUploads.random_forest, name="RF_Upload")
 
 

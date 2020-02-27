@@ -1,7 +1,26 @@
-{% extends "polls/base.html" %}
+{% extends "polls/dashBase.html" %}
 
 {% block content %}
 
-Welcome to the model execution section of our site.
+<form class="user" action="{% url 'polls:modelExecutionPOST' %}" method="POST">
+    {% csrf_token %}
+    Model name
+    <select name="modelName"  class="form-control form-control-user" id="exampleInputEmail" aria-describedby="emailHelp">
+        <option selected value="hi">Hi</option>
+    </select>
+    Bag Interval
+    <div class="form-group">
+      <input name="bagInterval" type="number" class="form-control form-control-user" id="exampleInputPassword">
+    </div>
+    <div class="form-group">
+        percentageTest
+        <input name="percentageTest" type="number" class="form-control form-control-user" id="exampleInputPassword">
+    </div>
+    <button class="btn btn-primary btn-user btn-block">
+      Execute Model
+    </button>
+  </form>
 
-{% endblock %}
+   <!-- <button>Execute model</button> -->
+
+{% endblock content %}

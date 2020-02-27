@@ -1,0 +1,20 @@
+Steps:
+0) gather data
+
+1) This preprocesses the data for a particular participant:
+python gen_flat_feature_file.py [participant directory eg participant_1]
+
+2) Aligns all the data on the minute marks. Squishes it all together.
+python gen_min_to_min.py [all_participants directory eg smoking_data]
+
+3) Creates pickles in the all_participants directory with the bag-interval for Multiple Instance Learning. Two pickles: one for test, one for train.
+python gen_bags.py [all_participants directory] --pct_test [percent in test eg .1 for 10%] --bag_interval [# in minutes]
+eg: python gen_bag.py ~/smoking_data --pct_test .1 --bag_interval 30
+
+4) Take those pickles and run it on a model with trainer.py
+eg: python trainer.py --train ~/smoking_data/train_intv\=60_min.pkl --sklearn 1 --take_mean --model RF --bag_interval 60
+
+
+5) Test the saved model with inference.py
+
+python3 inference.py --model ~/Research/smoking-intervention/python/Data/saved_models/RF/intv=30/2020-02-05_17:03:17/model.pkl --test ~/Research/smoking-intervention/python/Data/test_intv\=30_min.pkl
