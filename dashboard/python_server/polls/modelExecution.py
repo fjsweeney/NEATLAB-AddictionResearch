@@ -21,7 +21,13 @@ def index(request):
     if not request.user.is_authenticated:
         return redirect('/polls')
     
-    return render(request, 'polls/modelExecution/index.html')
+    context = {
+        'modelChoices': ["RF", "miSVM", "MISVM", "LRC", "GBC", "SVM"],
+        'bagIntervalChoices': [5, 10, 15, 20, 30, 60],
+        'percentageTestChoices': [.1, .15, .2, .25]
+    }
+
+    return render(request, 'polls/modelExecution/index.html', context)
 
 def modelExecutionPOST(request):
 
@@ -52,7 +58,7 @@ def modelExecutionPOST(request):
 
     # args = parser.parse_args(args=["./python_ml/Data", "5", ".2", "SVM", "--sklearn", "1"])
 
-    pipeline.main(['/home/weesp/Desktop/github_senior_proj/NEATLAB-AddictionResearch/dashboard/python_server/polls/python_ml/Data', '5', '.2', 'SVM', '--sklearn', '1'])
+    pipeline.main(['/home/weesp/Desktop/github_senior_proj/NEATLAB-AddictionResearch/dashboard/python_server/polls/python_ml/Data', request.POST['bagInterval'], request.POST['percentageTest'], request.POST['modelName'], '--sklearn', '1'])
 
     # if not request.user.is_authenticated:
     #     return redirect('/polls')
