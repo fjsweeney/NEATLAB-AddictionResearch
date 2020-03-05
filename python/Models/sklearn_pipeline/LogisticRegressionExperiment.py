@@ -34,6 +34,7 @@ class LogisticRegressionExperiment:
 
         score_metrics = ['f1', 'precision', 'recall', 'accuracy', 'roc_auc']
         self.grid = RandomizedSearchCV(estimator=pipeline,
+                                       return_train_score=True,
                                        param_distributions=hspace,
                                        scoring=score_metrics, n_iter=itrs,
                                        n_jobs=-1, verbose=10,

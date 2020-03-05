@@ -40,7 +40,9 @@ class GradientBoostedExperiment:
         }
 
         score_metrics = ['f1', 'precision', 'recall', 'accuracy', 'roc_auc']
+        input("HERE????")
         self.grid = RandomizedSearchCV(estimator=pipeline,
+                                       return_train_score=True,
                                        param_distributions=hspace,
                                        scoring=score_metrics, n_iter=itrs,
                                        n_jobs=-1, verbose=10,
@@ -48,6 +50,7 @@ class GradientBoostedExperiment:
                                        cv=StratifiedKFold(n_splits=6,
                                                           shuffle=True,
                                                           random_state=SEED))
+        input("Dude")
 
     def run(self):
         self.grid.fit(self.X, self.y)
