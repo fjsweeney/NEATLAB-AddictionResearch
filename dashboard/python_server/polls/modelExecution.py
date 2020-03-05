@@ -15,6 +15,8 @@ from .python_ml import pipeline
 
 import argparse
 
+DATASOURCE = "/home/weesp/DATA/"
+
 
 def index(request):
 
@@ -24,10 +26,16 @@ def index(request):
     context = {
         'modelChoices': ["RF", "miSVM", "MISVM", "LRC", "GBC", "SVM"],
         'bagIntervalChoices': [5, 10, 15, 20, 30, 60],
-        'percentageTestChoices': [.1, .15, .2, .25]
+        'percentageTestChoices': [.1, .15, .2, .25],
+        'datasetChoices': ['participant_1', 'participant_2', 'participant_3', 'participant_4']
     }
 
     return render(request, 'polls/modelExecution/index.html', context)
+
+
+def extractPathFromDatasetSelection(selection):
+    return DATASOURCE + selection + '_container'
+
 
 def modelExecutionPOST(request):
 
@@ -58,7 +66,9 @@ def modelExecutionPOST(request):
 
     # args = parser.parse_args(args=["./python_ml/Data", "5", ".2", "SVM", "--sklearn", "1"])
 
-    pipeline.main(['/home/weesp/Desktop/github_senior_proj/NEATLAB-AddictionResearch/dashboard/python_server/polls/python_ml/Data', request.POST['bagInterval'], request.POST['percentageTest'], request.POST['modelName'], '--sklearn', '1'])
+    dataPath = extractPathFromDatasetSelection(request.POST['dataset'])
+
+    pipeline.main([dataPath, request.POST['bagInterval'], request.POST['percentageTest'], request.POST['modelName'], '--sklearn', '1'])
 
     # if not request.user.is_authenticated:
     #     return redirect('/polls')

@@ -5,8 +5,17 @@
 <form class="form" class="" action="{% url 'polls:modelExecutionPOST' %}" method="POST">
     {% csrf_token %}
     <div class="form-group">
+      <label for="dataset">Dataset</label>
+      <select name="dataset"  class="form-control">
+          <option selected default>Select</option>
+          {% for dataset in datasetChoices %}
+            <option value="{{ dataset }}">{{ dataset }}</option>
+          {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
       <label for="modelName">Model Name</label>
-      <select name="modelName"  class="form-control " id="exampleInputEmail" aria-describedby="emailHelp">
+      <select name="modelName"  class="form-control">
           <option selected default>Select</option>
           {% for modelChoice in modelChoices %}
             <option value="{{ modelChoice }}">{{ modelChoice }}</option>
@@ -30,7 +39,6 @@
               <option value="{{ percentageTest }}">{{ percentageTest }}</option>
             {% endfor %}
         </select>
-
     </div>
     <div class="form-group">
       <button class="btn btn-primary btn-user btn-block">
@@ -42,4 +50,5 @@
    <!-- <button>Execute model</button> -->
 
 {% endblock content %}
+
 
