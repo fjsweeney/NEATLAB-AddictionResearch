@@ -23,7 +23,7 @@ def index(request):
         'modelChoices': ["RF", "miSVM", "MISVM", "LRC", "GBC", "SVM"],
         'bagIntervalChoices': [5, 10, 15, 20, 30, 60],
         'percentageTestChoices': [.1, .15, .2, .25],
-        'datasetChoices': ['participant_1', 'participant_2', 'participant_3', 'participant_4']
+        'datasetChoices': ['participant_1', 'participant_2', 'participant_3', 'participant_4', 'participant_5', 'participant_6', 'all_participants']
     }
 
     return render(request, 'polls/modelExecution/index.html', context)
