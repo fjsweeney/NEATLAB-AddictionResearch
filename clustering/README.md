@@ -14,23 +14,23 @@ Spatial KZ filter - remove sparse data? - https://en.wikipedia.org/wiki/Kolmogor
 Smoothing - https://en.wikipedia.org/wiki/Smoothing
 
 ###Works on my machine:
-.
-├── clusters.py
-├── gmplot_practice.py
-├── locs
-│   ├── location_1.csv
-│   ├── location_2.csv
-│   ├── location_3.csv
-│   ├── location_4.csv
-│   ├── location_5.csv
-│   └── location_6.csv
-├── mymap.html
-├── README.md
-└── sm_reports
-    ├── smoking_reports_1.csv
-    ├── smoking_reports_2.csv
-    ├── smoking_reports_3.csv
-    ├── smoking_reports_4.csv
-    ├── smoking_reports_5.csv
-    └── smoking_reports_6.csv
+.<br />
+├── clusters.py<br />
+├── gmplot_practice.py<br />
+├── locs<br />
+│   ├── location_1.csv<br />
+│   ├── location_2.csv<br />
+│   ├── location_3.csv<br />
+│   ├── location_4.csv<br />
+│   ├── location_5.csv<br />
+│   └── location_6.csv<br />
+├── mymap.html<br />
+├── README.md<br />
+└── sm_reports<br />
+    ├── smoking_reports_1.csv<br />
+    ├── smoking_reports_2.csv<br />
+    ├── smoking_reports_3.csv<br />
+    ├── smoking_reports_4.csv<br />
+    ├── smoking_reports_5.csv<br />
+    └── smoking_reports_6.csv<br />
 
