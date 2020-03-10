@@ -18,19 +18,19 @@ Smoothing - https://en.wikipedia.org/wiki/Smoothing
 ├── clusters.py<br />
 ├── gmplot_practice.py<br />
 ├── locs<br />
-│   ├── location_1.csv<br />
-│   ├── location_2.csv<br />
-│   ├── location_3.csv<br />
-│   ├── location_4.csv<br />
-│   ├── location_5.csv<br />
-│   └── location_6.csv<br />
+│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── location_1.csv<br />
+│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── location_2.csv<br />
+│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── location_3.csv<br />
+│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── location_4.csv<br />
+│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── location_5.csv<br />
+│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── location_6.csv<br />
 ├── mymap.html<br />
 ├── README.md<br />
 └── sm_reports<br />
-    ├── smoking_reports_1.csv<br />
-    ├── smoking_reports_2.csv<br />
-    ├── smoking_reports_3.csv<br />
-    ├── smoking_reports_4.csv<br />
-    ├── smoking_reports_5.csv<br />
-    └── smoking_reports_6.csv<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── smoking_reports_1.csv<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── smoking_reports_2.csv<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── smoking_reports_3.csv<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── smoking_reports_4.csv<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── smoking_reports_5.csv<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── smoking_reports_6.csv<br />
 
