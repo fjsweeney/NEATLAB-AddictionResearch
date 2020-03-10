@@ -26,3 +26,8 @@ li a
 {
     transform: rotateX(180deg);
 }
+
+.form{
+    width:75%; 
+    margin: 0 auto;
+}

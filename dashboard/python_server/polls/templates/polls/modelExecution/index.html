@@ -2,25 +2,53 @@
 
 {% block content %}
 
-<form class="user" action="{% url 'polls:modelExecutionPOST' %}" method="POST">
+<form class="form" class="" action="{% url 'polls:modelExecutionPOST' %}" method="POST">
     {% csrf_token %}
-    Model name
-    <select name="modelName"  class="form-control form-control-user" id="exampleInputEmail" aria-describedby="emailHelp">
-        <option selected value="hi">Hi</option>
-    </select>
-    Bag Interval
     <div class="form-group">
-      <input name="bagInterval" type="number" class="form-control form-control-user" id="exampleInputPassword">
+      <label for="dataset">Dataset</label>
+      <select name="dataset"  class="form-control">
+          <option selected default>Select</option>
+          {% for dataset in datasetChoices %}
+            <option value="{{ dataset }}">{{ dataset }}</option>
+          {% endfor %}
+      </select>
     </div>
     <div class="form-group">
-        percentageTest
-        <input name="percentageTest" type="number" class="form-control form-control-user" id="exampleInputPassword">
+      <label for="modelName">Model Name</label>
+      <select name="modelName"  class="form-control">
+          <option selected default>Select</option>
+          {% for modelChoice in modelChoices %}
+            <option value="{{ modelChoice }}">{{ modelChoice }}</option>
+          {% endfor %}
+      </select>
     </div>
-    <button class="btn btn-primary btn-user btn-block">
-      Execute Model
-    </button>
+    <div class="form-group">
+      <label for="bagInterval">Bag Interval (In minutes)</label>
+      <select name="bagInterval"  class="form-control" >
+          <option selected default>Select</option>
+          {% for bagInterval in bagIntervalChoices %}
+            <option value="{{ bagInterval }}">{{ bagInterval }}</option>
+          {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+        <label for="percentageTest">Percentage Test</label>
+        <select name="percentageTest" class="form-control" >
+            <option selected default>Select</option>
+            {% for percentageTest in percentageTestChoices %}
+              <option value="{{ percentageTest }}">{{ percentageTest }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary btn-user btn-block">
+        Execute Model
+      </button>
+    </div>
   </form>
 
    <!-- <button>Execute model</button> -->
 
 {% endblock content %}
+
+

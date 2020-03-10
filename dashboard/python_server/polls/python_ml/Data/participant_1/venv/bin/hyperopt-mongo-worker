@@ -1,6 +1,0 @@
-#!/home/chuprii/Research/smoking-intervention/python/Data/participant_1/venv/bin/python3
-import sys
-import hyperopt.mongoexp
-import logging
-logging.basicConfig(stream=sys.stderr, level=logging.INFO)
-sys.exit(hyperopt.mongoexp.main_worker())
